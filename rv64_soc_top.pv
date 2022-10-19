@@ -1,0 +1,386 @@
+module rv64_soc_top # (
+    parameter UDIV              = 868,
+    parameter AXI_DATA_WIDTH    = 64 ,
+    parameter AXI_ADDR_WIDTH    = 32 ,
+    parameter AXI_ID_WIDTH      = 4  ,
+    parameter AXI_USER_WIDTH    = 1
+)(
+    input                               clk       ,
+    input                               rst_n     ,
+    input                               pd_rxd    ,
+    input                               uart0_rxd ,
+    output                              uart0_txd
+);
+
+//*wire
+wire                              master_axi_aw_ready   ;
+wire                              master_axi_aw_valid   ;
+wire [AXI_ADDR_WIDTH-1:0]         master_axi_aw_addr    ;
+wire [2:0]                        master_axi_aw_prot    ;
+wire [AXI_ID_WIDTH-1:0]           master_axi_aw_id      ;
+wire [AXI_USER_WIDTH-1:0]         master_axi_aw_user    ;
+wire [7:0]                        master_axi_aw_len     ;
+wire [2:0]                        master_axi_aw_size    ;
+wire [1:0]                        master_axi_aw_burst   ;
+wire                              master_axi_aw_lock    ;
+wire [3:0]                        master_axi_aw_cache   ;
+wire [3:0]                        master_axi_aw_qos     ;
+wire [3:0]                        master_axi_aw_region  ;
+wire                              master_axi_w_ready    ;
+wire                              master_axi_w_valid    ;
+wire [AXI_DATA_WIDTH-1:0]         master_axi_w_data     ;
+wire [AXI_DATA_WIDTH/8-1:0]       master_axi_w_strb     ;
+wire                              master_axi_w_last     ;
+wire [AXI_USER_WIDTH-1:0]         master_axi_w_user     ;
+wire                              master_axi_b_ready    ;
+wire                              master_axi_b_valid    ;
+wire [1:0]                        master_axi_b_resp     ;
+wire [AXI_ID_WIDTH-1:0]           master_axi_b_id       ;
+wire [AXI_USER_WIDTH-1:0]         master_axi_b_user     ;
+wire                              master_axi_ar_ready   ;
+wire                              master_axi_ar_valid   ;
+wire [AXI_ADDR_WIDTH-1:0]         master_axi_ar_addr    ;
+wire [2:0]                        master_axi_ar_prot    ;
+wire [AXI_ID_WIDTH-1:0]           master_axi_ar_id      ;
+wire [AXI_USER_WIDTH-1:0]         master_axi_ar_user    ;
+wire [7:0]                        master_axi_ar_len     ;
+wire [2:0]                        master_axi_ar_size    ;
+wire [1:0]                        master_axi_ar_burst   ;
+wire                              master_axi_ar_lock    ;
+wire [3:0]                        master_axi_ar_cache   ;
+wire [3:0]                        master_axi_ar_qos     ;
+wire [3:0]                        master_axi_ar_region  ;
+wire                              master_axi_r_ready    ;
+wire                              master_axi_r_valid    ;
+wire [1:0]                        master_axi_r_resp     ;
+wire [AXI_DATA_WIDTH-1:0]         master_axi_r_data     ;
+wire                              master_axi_r_last     ;
+wire [AXI_ID_WIDTH-1:0]           master_axi_r_id       ;
+wire [AXI_USER_WIDTH-1:0]         master_axi_r_user     ;
+`pv_begin
+for i in range(0,2):
+    print("wire                              slave%d_axi_aw_ready   ;"%(i));
+    print("wire                              slave%d_axi_aw_valid   ;"%(i));
+    print("wire [AXI_ADDR_WIDTH-1:0]         slave%d_axi_aw_addr    ;"%(i));
+    print("wire [2:0]                        slave%d_axi_aw_prot    ;"%(i));
+    print("wire [AXI_ID_WIDTH-1:0]           slave%d_axi_aw_id      ;"%(i));
+    print("wire [AXI_USER_WIDTH-1:0]         slave%d_axi_aw_user    ;"%(i));
+    print("wire [7:0]                        slave%d_axi_aw_len     ;"%(i));
+    print("wire [2:0]                        slave%d_axi_aw_size    ;"%(i));
+    print("wire [1:0]                        slave%d_axi_aw_burst   ;"%(i));
+    print("wire                              slave%d_axi_aw_lock    ;"%(i));
+    print("wire [3:0]                        slave%d_axi_aw_cache   ;"%(i));
+    print("wire [3:0]                        slave%d_axi_aw_qos     ;"%(i));
+    print("wire [3:0]                        slave%d_axi_aw_region  ;"%(i));
+    print("wire                              slave%d_axi_w_ready    ;"%(i));
+    print("wire                              slave%d_axi_w_valid    ;"%(i));
+    print("wire [AXI_DATA_WIDTH-1:0]         slave%d_axi_w_data     ;"%(i));
+    print("wire [AXI_DATA_WIDTH/8-1:0]       slave%d_axi_w_strb     ;"%(i));
+    print("wire                              slave%d_axi_w_last     ;"%(i));
+    print("wire [AXI_USER_WIDTH-1:0]         slave%d_axi_w_user     ;"%(i));
+    print("wire                              slave%d_axi_b_ready    ;"%(i));
+    print("wire                              slave%d_axi_b_valid    ;"%(i));
+    print("wire [1:0]                        slave%d_axi_b_resp     ;"%(i));
+    print("wire [AXI_ID_WIDTH-1:0]           slave%d_axi_b_id       ;"%(i));
+    print("wire [AXI_USER_WIDTH-1:0]         slave%d_axi_b_user     ;"%(i));
+    print("wire                              slave%d_axi_ar_ready   ;"%(i));
+    print("wire                              slave%d_axi_ar_valid   ;"%(i));
+    print("wire [AXI_ADDR_WIDTH-1:0]         slave%d_axi_ar_addr    ;"%(i));
+    print("wire [2:0]                        slave%d_axi_ar_prot    ;"%(i));
+    print("wire [AXI_ID_WIDTH-1:0]           slave%d_axi_ar_id      ;"%(i));
+    print("wire [AXI_USER_WIDTH-1:0]         slave%d_axi_ar_user    ;"%(i));
+    print("wire [7:0]                        slave%d_axi_ar_len     ;"%(i));
+    print("wire [2:0]                        slave%d_axi_ar_size    ;"%(i));
+    print("wire [1:0]                        slave%d_axi_ar_burst   ;"%(i));
+    print("wire                              slave%d_axi_ar_lock    ;"%(i));
+    print("wire [3:0]                        slave%d_axi_ar_cache   ;"%(i));
+    print("wire [3:0]                        slave%d_axi_ar_qos     ;"%(i));
+    print("wire [3:0]                        slave%d_axi_ar_region  ;"%(i));
+    print("wire                              slave%d_axi_r_ready    ;"%(i));
+    print("wire                              slave%d_axi_r_valid    ;"%(i));
+    print("wire [1:0]                        slave%d_axi_r_resp     ;"%(i));
+    print("wire [AXI_DATA_WIDTH-1:0]         slave%d_axi_r_data     ;"%(i));
+    print("wire                              slave%d_axi_r_last     ;"%(i));
+    print("wire [AXI_ID_WIDTH-1:0]           slave%d_axi_r_id       ;"%(i));
+    print("wire [AXI_USER_WIDTH-1:0]         slave%d_axi_r_user     ;"%(i));
+
+`pv_end
+//*wire_end
+
+//core
+core #(
+    //
+) core
+(
+.clk                       (clk                 ),
+.rst_n                     (rst_n               ),
+.pd                        (pd                  ),
+.core_axi_aw_ready_i       (master_axi_aw_ready ),
+.core_axi_aw_valid_o       (master_axi_aw_valid ),
+.core_axi_aw_addr_o        (master_axi_aw_addr  ),
+.core_axi_aw_prot_o        (master_axi_aw_prot  ),
+.core_axi_aw_id_o          (master_axi_aw_id    ),
+.core_axi_aw_user_o        (master_axi_aw_user  ),
+.core_axi_aw_len_o         (master_axi_aw_len   ),
+.core_axi_aw_size_o        (master_axi_aw_size  ),
+.core_axi_aw_burst_o       (master_axi_aw_burst ),
+.core_axi_aw_lock_o        (master_axi_aw_lock  ),
+.core_axi_aw_cache_o       (master_axi_aw_cache ),
+.core_axi_aw_qos_o         (master_axi_aw_qos   ),
+.core_axi_aw_region_o      (master_axi_aw_region),
+.core_axi_w_ready_i        (master_axi_w_ready  ),
+.core_axi_w_valid_o        (master_axi_w_valid  ),
+.core_axi_w_data_o         (master_axi_w_data   ),
+.core_axi_w_strb_o         (master_axi_w_strb   ),
+.core_axi_w_last_o         (master_axi_w_last   ),
+.core_axi_w_user_o         (master_axi_w_user   ),
+.core_axi_b_ready_o        (master_axi_b_ready  ),
+.core_axi_b_valid_i        (master_axi_b_valid  ),
+.core_axi_b_resp_i         (master_axi_b_resp   ),
+.core_axi_b_id_i           (master_axi_b_id     ),
+.core_axi_b_user_i         (master_axi_b_user   ),
+.core_axi_ar_ready_i       (master_axi_ar_ready ),
+.core_axi_ar_valid_o       (master_axi_ar_valid ),
+.core_axi_ar_addr_o        (master_axi_ar_addr  ),
+.core_axi_ar_prot_o        (master_axi_ar_prot  ),
+.core_axi_ar_id_o          (master_axi_ar_id    ),
+.core_axi_ar_user_o        (master_axi_ar_user  ),
+.core_axi_ar_len_o         (master_axi_ar_len   ),
+.core_axi_ar_size_o        (master_axi_ar_size  ),
+.core_axi_ar_burst_o       (master_axi_ar_burst ),
+.core_axi_ar_lock_o        (master_axi_ar_lock  ),
+.core_axi_ar_cache_o       (master_axi_ar_cache ),
+.core_axi_ar_qos_o         (master_axi_ar_qos   ),
+.core_axi_ar_region_o      (master_axi_ar_region),
+.core_axi_r_ready_o        (master_axi_r_ready  ),
+.core_axi_r_valid_i        (master_axi_r_valid  ),
+.core_axi_r_resp_i         (master_axi_r_resp   ),
+.core_axi_r_data_i         (master_axi_r_data   ),
+.core_axi_r_last_i         (master_axi_r_last   ),
+.core_axi_r_id_i           (master_axi_r_id     ),
+.core_axi_r_user_i         (master_axi_r_user   )
+);
+//core end
+
+//crossbar
+axi4_crossbar #(
+    .AXI_DATA_WIDTH(AXI_DATA_WIDTH),
+    .AXI_ADDR_WIDTH(AXI_ADDR_WIDTH),
+    .AXI_ID_WIDTH  (AXI_ID_WIDTH  ),
+    .AXI_USER_WIDTH(AXI_USER_WIDTH)
+) axi4_crossbar_
+(
+.clk                      (clk                 ),
+.rst_n                    (rst_n               ),
+    // Advanced eXtensible Interface
+    //slave
+`pv_begin
+for i in range(0,2):
+    print(".slave%d_axi_aw_ready_i      (slave%d_axi_aw_ready ),"%(i,i));
+    print(".slave%d_axi_aw_valid_o      (slave%d_axi_aw_valid ),"%(i,i));
+    print(".slave%d_axi_aw_addr_o       (slave%d_axi_aw_addr  ),"%(i,i));
+    print(".slave%d_axi_aw_prot_o       (slave%d_axi_aw_prot  ),"%(i,i));
+    print(".slave%d_axi_aw_id_o         (slave%d_axi_aw_id    ),"%(i,i));
+    print(".slave%d_axi_aw_user_o       (slave%d_axi_aw_user  ),"%(i,i));
+    print(".slave%d_axi_aw_len_o        (slave%d_axi_aw_len   ),"%(i,i));
+    print(".slave%d_axi_aw_size_o       (slave%d_axi_aw_size  ),"%(i,i));
+    print(".slave%d_axi_aw_burst_o      (slave%d_axi_aw_burst ),"%(i,i));
+    print(".slave%d_axi_aw_lock_o       (slave%d_axi_aw_lock  ),"%(i,i));
+    print(".slave%d_axi_aw_cache_o      (slave%d_axi_aw_cache ),"%(i,i));
+    print(".slave%d_axi_aw_qos_o        (slave%d_axi_aw_qos   ),"%(i,i));
+    print(".slave%d_axi_aw_region_o     (slave%d_axi_aw_region),"%(i,i));
+    print(".slave%d_axi_w_ready_i       (slave%d_axi_w_ready  ),"%(i,i));
+    print(".slave%d_axi_w_valid_o       (slave%d_axi_w_valid  ),"%(i,i));
+    print(".slave%d_axi_w_data_o        (slave%d_axi_w_data   ),"%(i,i));
+    print(".slave%d_axi_w_strb_o        (slave%d_axi_w_strb   ),"%(i,i));
+    print(".slave%d_axi_w_last_o        (slave%d_axi_w_last   ),"%(i,i));
+    print(".slave%d_axi_w_user_o        (slave%d_axi_w_user   ),"%(i,i));
+    print(".slave%d_axi_b_ready_o       (slave%d_axi_b_ready  ),"%(i,i));
+    print(".slave%d_axi_b_valid_i       (slave%d_axi_b_valid  ),"%(i,i));
+    print(".slave%d_axi_b_resp_i        (slave%d_axi_b_resp   ),"%(i,i));
+    print(".slave%d_axi_b_id_i          (slave%d_axi_b_id     ),"%(i,i));
+    print(".slave%d_axi_b_user_i        (slave%d_axi_b_user   ),"%(i,i));
+    print(".slave%d_axi_ar_ready_i      (slave%d_axi_ar_ready ),"%(i,i));
+    print(".slave%d_axi_ar_valid_o      (slave%d_axi_ar_valid ),"%(i,i));
+    print(".slave%d_axi_ar_addr_o       (slave%d_axi_ar_addr  ),"%(i,i));
+    print(".slave%d_axi_ar_prot_o       (slave%d_axi_ar_prot  ),"%(i,i));
+    print(".slave%d_axi_ar_id_o         (slave%d_axi_ar_id    ),"%(i,i));
+    print(".slave%d_axi_ar_user_o       (slave%d_axi_ar_user  ),"%(i,i));
+    print(".slave%d_axi_ar_len_o        (slave%d_axi_ar_len   ),"%(i,i));
+    print(".slave%d_axi_ar_size_o       (slave%d_axi_ar_size  ),"%(i,i));
+    print(".slave%d_axi_ar_burst_o      (slave%d_axi_ar_burst ),"%(i,i));
+    print(".slave%d_axi_ar_lock_o       (slave%d_axi_ar_lock  ),"%(i,i));
+    print(".slave%d_axi_ar_cache_o      (slave%d_axi_ar_cache ),"%(i,i));
+    print(".slave%d_axi_ar_qos_o        (slave%d_axi_ar_qos   ),"%(i,i));
+    print(".slave%d_axi_ar_region_o     (slave%d_axi_ar_region),"%(i,i));
+    print(".slave%d_axi_r_ready_o       (slave%d_axi_r_ready  ),"%(i,i));
+    print(".slave%d_axi_r_valid_i       (slave%d_axi_r_valid  ),"%(i,i));
+    print(".slave%d_axi_r_resp_i        (slave%d_axi_r_resp   ),"%(i,i));
+    print(".slave%d_axi_r_data_i        (slave%d_axi_r_data   ),"%(i,i));
+    print(".slave%d_axi_r_last_i        (slave%d_axi_r_last   ),"%(i,i));
+    print(".slave%d_axi_r_id_i          (slave%d_axi_r_id     ),"%(i,i));
+    print(".slave%d_axi_r_user_i        (slave%d_axi_r_user   ),"%(i,i));
+`pv_end
+    //Master
+.master_axi_aw_ready_o      (master_axi_aw_ready ),
+.master_axi_aw_valid_i      (master_axi_aw_valid ),
+.master_axi_aw_addr_i       (master_axi_aw_addr  ),
+.master_axi_aw_prot_i       (master_axi_aw_prot  ),
+.master_axi_aw_id_i         (master_axi_aw_id    ),
+.master_axi_aw_user_i       (master_axi_aw_user  ),
+.master_axi_aw_len_i        (master_axi_aw_len   ),
+.master_axi_aw_size_i       (master_axi_aw_size  ),
+.master_axi_aw_burst_i      (master_axi_aw_burst ),
+.master_axi_aw_lock_i       (master_axi_aw_lock  ),
+.master_axi_aw_cache_i      (master_axi_aw_cache ),
+.master_axi_aw_qos_i        (master_axi_aw_qos   ),
+.master_axi_aw_region_i     (master_axi_aw_region),
+.master_axi_w_ready_o       (master_axi_w_ready  ),
+.master_axi_w_valid_i       (master_axi_w_valid  ),
+.master_axi_w_data_i        (master_axi_w_data   ),
+.master_axi_w_strb_i        (master_axi_w_strb   ),
+.master_axi_w_last_i        (master_axi_w_last   ),
+.master_axi_w_user_i        (master_axi_w_user   ),
+.master_axi_b_ready_i       (master_axi_b_ready  ),
+.master_axi_b_valid_o       (master_axi_b_valid  ),
+.master_axi_b_resp_o        (master_axi_b_resp   ),
+.master_axi_b_id_o          (master_axi_b_id     ),
+.master_axi_b_user_o        (master_axi_b_user   ),
+.master_axi_ar_ready_o      (master_axi_ar_ready ),
+.master_axi_ar_valid_i      (master_axi_ar_valid ),
+.master_axi_ar_addr_i       (master_axi_ar_addr  ),
+.master_axi_ar_prot_i       (master_axi_ar_prot  ),
+.master_axi_ar_id_i         (master_axi_ar_id    ),
+.master_axi_ar_user_i       (master_axi_ar_user  ),
+.master_axi_ar_len_i        (master_axi_ar_len   ),
+.master_axi_ar_size_i       (master_axi_ar_size  ),
+.master_axi_ar_burst_i      (master_axi_ar_burst ),
+.master_axi_ar_lock_i       (master_axi_ar_lock  ),
+.master_axi_ar_cache_i      (master_axi_ar_cache ),
+.master_axi_ar_qos_i        (master_axi_ar_qos   ),
+.master_axi_ar_region_i     (master_axi_ar_region),
+.master_axi_r_ready_i       (master_axi_r_ready  ),
+.master_axi_r_valid_o       (master_axi_r_valid  ),
+.master_axi_r_resp_o        (master_axi_r_resp   ),
+.master_axi_r_data_o        (master_axi_r_data   ),
+.master_axi_r_last_o        (master_axi_r_last   ),
+.master_axi_r_id_o          (master_axi_r_id     ),
+.master_axi_r_user_o        (master_axi_r_user   )
+);
+//crossbar end
+
+//AXI4 ram
+axi4_ram #(
+    //
+) axi4_ram_
+(
+.clk                     (clk                 ),
+.rst_n                   (rst_n               ),
+.ram_axi_aw_ready_o      (slave0_axi_aw_ready ),
+.ram_axi_aw_valid_i      (slave0_axi_aw_valid ),
+.ram_axi_aw_addr_i       (slave0_axi_aw_addr  ),
+.ram_axi_aw_prot_i       (slave0_axi_aw_prot  ),
+.ram_axi_aw_id_i         (slave0_axi_aw_id    ),
+.ram_axi_aw_user_i       (slave0_axi_aw_user  ),
+.ram_axi_aw_len_i        (slave0_axi_aw_len   ),
+.ram_axi_aw_size_i       (slave0_axi_aw_size  ),
+.ram_axi_aw_burst_i      (slave0_axi_aw_burst ),
+.ram_axi_aw_lock_i       (slave0_axi_aw_lock  ),
+.ram_axi_aw_cache_i      (slave0_axi_aw_cache ),
+.ram_axi_aw_qos_i        (slave0_axi_aw_qos   ),
+.ram_axi_aw_region_i     (slave0_axi_aw_region),
+.ram_axi_w_ready_o       (slave0_axi_w_ready  ),
+.ram_axi_w_valid_i       (slave0_axi_w_valid  ),
+.ram_axi_w_data_i        (slave0_axi_w_data   ),
+.ram_axi_w_strb_i        (slave0_axi_w_strb   ),
+.ram_axi_w_last_i        (slave0_axi_w_last   ),
+.ram_axi_w_user_i        (slave0_axi_w_user   ),
+.ram_axi_b_ready_i       (slave0_axi_b_ready  ),
+.ram_axi_b_valid_o       (slave0_axi_b_valid  ),
+.ram_axi_b_resp_o        (slave0_axi_b_resp   ),
+.ram_axi_b_id_o          (slave0_axi_b_id     ),
+.ram_axi_b_user_o        (slave0_axi_b_user   ),
+.ram_axi_ar_ready_o      (slave0_axi_ar_ready ),
+.ram_axi_ar_valid_i      (slave0_axi_ar_valid ),
+.ram_axi_ar_addr_i       (slave0_axi_ar_addr  ),
+.ram_axi_ar_prot_i       (slave0_axi_ar_prot  ),
+.ram_axi_ar_id_i         (slave0_axi_ar_id    ),
+.ram_axi_ar_user_i       (slave0_axi_ar_user  ),
+.ram_axi_ar_len_i        (slave0_axi_ar_len   ),
+.ram_axi_ar_size_i       (slave0_axi_ar_size  ),
+.ram_axi_ar_burst_i      (slave0_axi_ar_burst ),
+.ram_axi_ar_lock_i       (slave0_axi_ar_lock  ),
+.ram_axi_ar_cache_i      (slave0_axi_ar_cache ),
+.ram_axi_ar_qos_i        (slave0_axi_ar_qos   ),
+.ram_axi_ar_region_i     (slave0_axi_ar_region),
+.ram_axi_r_ready_i       (slave0_axi_r_ready  ),
+.ram_axi_r_valid_o       (slave0_axi_r_valid  ),
+.ram_axi_r_resp_o        (slave0_axi_r_resp   ),
+.ram_axi_r_data_o        (slave0_axi_r_data   ),
+.ram_axi_r_last_o        (slave0_axi_r_last   ),
+.ram_axi_r_id_o          (slave0_axi_r_id     ),
+.ram_axi_r_user_o        (slave0_axi_r_user   )
+);
+
+//AXI4 ram end
+
+//AXI4 uart
+axi4_uart #(
+    //
+) axi4_uart_
+(
+    //UART PORT
+.clk                      (clk                 ),
+.rst_n                    (rst_n               ),
+.rxd                      (uart0_rxd           ),
+.txd                      (uart0_txd           ),   
+    //AXI PORT
+.uart_axi_aw_ready_o      (slave1_axi_aw_ready ),
+.uart_axi_aw_valid_i      (slave1_axi_aw_valid ),
+.uart_axi_aw_addr_i       (slave1_axi_aw_addr  ),
+.uart_axi_aw_prot_i       (slave1_axi_aw_prot  ),
+.uart_axi_aw_id_i         (slave1_axi_aw_id    ),
+.uart_axi_aw_user_i       (slave1_axi_aw_user  ),
+.uart_axi_aw_len_i        (slave1_axi_aw_len   ),
+.uart_axi_aw_size_i       (slave1_axi_aw_size  ),
+.uart_axi_aw_burst_i      (slave1_axi_aw_burst ),
+.uart_axi_aw_lock_i       (slave1_axi_aw_lock  ),
+.uart_axi_aw_cache_i      (slave1_axi_aw_cache ),
+.uart_axi_aw_qos_i        (slave1_axi_aw_qos   ),
+.uart_axi_aw_region_i     (slave1_axi_aw_region),
+.uart_axi_w_ready_o       (slave1_axi_w_ready  ),
+.uart_axi_w_valid_i       (slave1_axi_w_valid  ),
+.uart_axi_w_data_i        (slave1_axi_w_data   ),
+.uart_axi_w_strb_i        (slave1_axi_w_strb   ),
+.uart_axi_w_last_i        (slave1_axi_w_last   ),
+.uart_axi_w_user_i        (slave1_axi_w_user   ),
+.uart_axi_b_ready_i       (slave1_axi_b_ready  ),
+.uart_axi_b_valid_o       (slave1_axi_b_valid  ),
+.uart_axi_b_resp_o        (slave1_axi_b_resp   ),
+.uart_axi_b_id_o          (slave1_axi_b_id     ),
+.uart_axi_b_user_o        (slave1_axi_b_user   ),
+.uart_axi_ar_ready_o      (slave1_axi_ar_ready ),
+.uart_axi_ar_valid_i      (slave1_axi_ar_valid ),
+.uart_axi_ar_addr_i       (slave1_axi_ar_addr  ),
+.uart_axi_ar_prot_i       (slave1_axi_ar_prot  ),
+.uart_axi_ar_id_i         (slave1_axi_ar_id    ),
+.uart_axi_ar_user_i       (slave1_axi_ar_user  ),
+.uart_axi_ar_len_i        (slave1_axi_ar_len   ),
+.uart_axi_ar_size_i       (slave1_axi_ar_size  ),
+.uart_axi_ar_burst_i      (slave1_axi_ar_burst ),
+.uart_axi_ar_lock_i       (slave1_axi_ar_lock  ),
+.uart_axi_ar_cache_i      (slave1_axi_ar_cache ),
+.uart_axi_ar_qos_i        (slave1_axi_ar_qos   ),
+.uart_axi_ar_region_i     (slave1_axi_ar_region),
+.uart_axi_r_ready_i       (slave1_axi_r_ready  ),
+.uart_axi_r_valid_o       (slave1_axi_r_valid  ),
+.uart_axi_r_resp_o        (slave1_axi_r_resp   ),
+.uart_axi_r_data_o        (slave1_axi_r_data   ),
+.uart_axi_r_last_o        (slave1_axi_r_last   ),
+.uart_axi_r_id_o          (slave1_axi_r_id     ),
+.uart_axi_r_user_o        (slave1_axi_r_user   )
+);
+
+//AXI4 uart end
+
+endmodule
