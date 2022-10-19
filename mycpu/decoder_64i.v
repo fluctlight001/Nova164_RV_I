@@ -1,4 +1,4 @@
-module decoder_i (
+module decoder_64i (
     input [31:0] inst,
     
     // ex stage
