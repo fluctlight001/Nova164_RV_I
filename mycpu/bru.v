@@ -1,13 +1,13 @@
 module bru(
-    input wire [31:0] pc,
+    input wire [63:0] pc,
     input wire [7:0] bru_op,
-    input wire [31:0] rdata1,
-    input wire [31:0] rdata2,
-    input wire [31:0] imm,
+    input wire [63:0] rdata1,
+    input wire [63:0] rdata2,
+    input wire [63:0] imm,
 
     output wire br_e,
-    output wire [31:0] br_addr,
-    output wire [31:0] br_result
+    output wire [63:0] br_addr,
+    output wire [63:0] br_result
 );
 
     wire inst_beq, inst_bne, inst_blt, inst_bge, inst_bltu, inst_bgeu, inst_jal, inst_jalr;
@@ -30,10 +30,10 @@ module bru(
     assign rs1_ge_rs2 = ~rs1_lt_rs2;
     assign rs1_geu_rs2 = ~rs1_ltu_rs2;
 
-    wire [31:0] pc_plus_imm;
-    wire [31:0] rs_plus_imm;
+    wire [63:0] pc_plus_imm;
+    wire [63:0] rs_plus_imm;
     assign pc_plus_imm = pc + imm;
-    assign rs_plus_imm = rdata1 + imm;
+    assign rs_plus_imm = (rdata1 + imm) & (~1);
 
     assign br_e = inst_beq & rs1_eq_rs2
                 | inst_bne & rs1_ne_rs2
@@ -44,7 +44,7 @@ module bru(
                 | inst_jal
                 | inst_jalr;
     assign br_addr = inst_beq | inst_bne | inst_blt | inst_bltu | inst_bge | inst_bgeu | inst_jal ? pc_plus_imm 
-                    :inst_jalr ? rs_plus_imm : 32'b0;
+                    :inst_jalr ? rs_plus_imm : 64'b0;
     assign br_result = pc + 4'd4;
 
 endmodule

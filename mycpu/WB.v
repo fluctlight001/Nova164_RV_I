@@ -12,10 +12,10 @@ module WB
     output wire [WB2RF_WD-1:0] wb2rf_bus,
     output wire [WB2EX_WD-1:0] wb2ex_fwd,
 
-    output wire [31:0]  debug_wb_pc,
+    output wire [63:0]  debug_wb_pc,
     output wire [3:0]   debug_wb_rf_we,
     output wire [4:0]   debug_wb_rf_wnum,
-    output wire [31:0]  debug_wb_rf_wdata
+    output wire [63:0]  debug_wb_rf_wdata
 );
 
     reg [MEM2WB_WD-1:0] mem2wb_bus_r;
@@ -32,8 +32,9 @@ module WB
     end
     wire rf_we;
     wire [4:0] rf_waddr;
-    wire [31:0] rf_wdata;
-    wire [31:0] pc,inst;
+    wire [63:0] rf_wdata;
+    wire [63:0] pc;
+    wire [31:0] inst;
 
     assign {
         rf_we,
@@ -52,7 +53,7 @@ module WB
     assign wb2ex_fwd = wb2rf_bus;
 
     assign debug_wb_pc = pc;
-    assign debug_wb_rf_we = {4{rf_we}};
+    assign debug_wb_rf_we = {8{rf_we}};
     assign debug_wb_rf_wnum = rf_waddr;
     assign debug_wb_rf_wdata = rf_wdata;
 endmodule

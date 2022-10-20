@@ -1,8 +1,8 @@
 module alu(
     input wire [9:0] alu_op,
-    input wire [31:0] alu_src1,
-    input wire [31:0] alu_src2,
-    output wire [31:0] alu_result
+    input wire [63:0] alu_src1,
+    input wire [63:0] alu_src2,
+    output wire [63:0] alu_result
 );
 
     wire op_add;
@@ -22,24 +22,24 @@ module alu(
         op_or, op_and
     } = alu_op;
     
-    wire [31:0] add_sub_result;
-    wire [31:0] slt_result;
-    wire [31:0] sltu_result;
-    wire [31:0] and_result;
-    wire [31:0] or_result; 
-    wire [31:0] xor_result;
-    wire [31:0] sll_result;
-    wire [31:0] srl_result;
-    wire [31:0] sra_result;
+    wire [63:0] add_sub_result;
+    wire [63:0] slt_result;
+    wire [63:0] sltu_result;
+    wire [63:0] and_result;
+    wire [63:0] or_result; 
+    wire [63:0] xor_result;
+    wire [63:0] sll_result;
+    wire [63:0] srl_result;
+    wire [63:0] sra_result;
 
     assign and_result = alu_src1 & alu_src2;
     assign or_result = alu_src1 | alu_src2;
     assign xor_result = alu_src1 ^ alu_src2;
 
-    wire [31:0] adder_a;
-    wire [31:0] adder_b;
+    wire [63:0] adder_a;
+    wire [63:0] adder_b;
     wire        adder_cin;
-    wire [31:0] adder_result;
+    wire [63:0] adder_result;
     wire        adder_cout;
 
     assign adder_a = alu_src1;
@@ -49,25 +49,26 @@ module alu(
 
     assign add_sub_result = adder_result;
 
-    assign slt_result[31:1] = 31'b0;
-    assign slt_result[0] = (alu_src1[31] & ~alu_src2[31]) 
-                         | (~(alu_src1[31]^alu_src2[31]) & adder_result[31]);
+    assign slt_result[63:1] = 63'b0;
+    assign slt_result[0] = (alu_src1[63] & ~alu_src2[63]) 
+                         | (~(alu_src1[63]^alu_src2[63]) & adder_result[63]);
     
-    assign sltu_result[31:1] = 31'b0;
+    assign sltu_result[63:1] = 63'b0;
     assign sltu_result[0] = ~adder_cout;
 
-    assign sll_result = alu_src1 << alu_src2[4:0];
-    assign srl_result = alu_src1 >> alu_src2[4:0];
-    assign sra_result = ($signed(alu_src1)) >>> alu_src2[4:0];
+    // 针对 slli srli srai的shamt6做了修改
+    assign sll_result = alu_src1 << alu_src2[5:0];
+    assign srl_result = alu_src1 >> alu_src2[5:0];
+    assign sra_result = ($signed(alu_src1)) >>> alu_src2[5:0];
 
-    assign alu_result = ({32{op_add|op_sub  }} & add_sub_result)
-                      | ({32{op_slt         }} & slt_result)
-                      | ({32{op_sltu        }} & sltu_result)
-                      | ({32{op_and         }} & and_result)
-                      | ({32{op_or          }} & or_result)
-                      | ({32{op_xor         }} & xor_result)
-                      | ({32{op_sll         }} & sll_result)
-                      | ({32{op_srl         }} & srl_result)
-                      | ({32{op_sra         }} & sra_result);
+    assign alu_result = ({64{op_add|op_sub  }} & add_sub_result)
+                      | ({64{op_slt         }} & slt_result)
+                      | ({64{op_sltu        }} & sltu_result)
+                      | ({64{op_and         }} & and_result)
+                      | ({64{op_or          }} & or_result)
+                      | ({64{op_xor         }} & xor_result)
+                      | ({64{op_sll         }} & sll_result)
+                      | ({64{op_srl         }} & srl_result)
+                      | ({64{op_sra         }} & sra_result);
                       
 endmodule

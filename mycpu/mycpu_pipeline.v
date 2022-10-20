@@ -12,21 +12,21 @@ module mycpu_pipeline
     input  wire rst_n,
 
     output wire         inst_sram_en,
-    output wire [3:0]   inst_sram_we,
-    output wire [31:0]  inst_sram_addr,
-    output wire [31:0]  inst_sram_wdata,
-    input  wire [31:0]  inst_sram_rdata,
+    output wire [7:0]   inst_sram_we,
+    output wire [63:0]  inst_sram_addr,
+    output wire [63:0]  inst_sram_wdata,
+    input  wire [63:0]  inst_sram_rdata,
 
     output wire         data_sram_en,
-    output wire [3:0]   data_sram_we,
-    output wire [31:0]  data_sram_addr,
-    output wire [31:0]  data_sram_wdata,
-    input  wire [31:0]  data_sram_rdata,
+    output wire [7:0]   data_sram_we,
+    output wire [63:0]  data_sram_addr,
+    output wire [63:0]  data_sram_wdata,
+    input  wire [63:0]  data_sram_rdata,
 
-    output wire [31:0]  debug_wb_pc,
-    output wire [3:0]   debug_wb_rf_we,
+    output wire [63:0]  debug_wb_pc,
+    output wire [7:0]   debug_wb_rf_we,
     output wire [4:0]   debug_wb_rf_wnum,
-    output wire [31:0]  debug_wb_rf_wdata
+    output wire [63:0]  debug_wb_rf_wdata
 );
 
     wire [ID2EX_WD-1:0] id2ex_bus;
@@ -35,7 +35,7 @@ module mycpu_pipeline
     wire [WB2RF_WD-1:0] wb2rf_bus;
     wire [MEM2EX_WD-1:0] mem2ex_fwd;
     wire [WB2EX_WD-1:0] wb2ex_fwd;
-    wire [32:0] br_bus;
+    wire [64:0] br_bus;
     wire stallreq_ex;
     wire stallreq_id;
     wire [5:0] stall;
@@ -60,7 +60,7 @@ module mycpu_pipeline
     	.clk             (clk             ),
         .rst_n           (rst_n           ),
         .stall           (stall           ),
-        .br_e            (br_bus[32]      ),
+        .br_e            (br_bus[64]      ),
         .stallreq_id     (stallreq_id     ),
         .pc_valid        (inst_sram_en    ),
         .pc              (inst_sram_addr  ),
