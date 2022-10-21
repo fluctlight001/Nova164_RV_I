@@ -148,7 +148,7 @@ mycpu_top cpu(
 );
 
 //inst ram
-inst_ram inst_ram
+bdram_64 inst_ram
 (
     .clka  (cpu_clk            ),   
     .ena   (cpu_inst_en        ),
@@ -159,7 +159,7 @@ inst_ram inst_ram
 );
 
 //data ram
-data_ram data_ram
+bdram_64 data_ram
 (
     .clka  (cpu_clk            ),   
     .ena   (cpu_data_en        ),
