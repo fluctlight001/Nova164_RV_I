@@ -38,7 +38,7 @@ module IF(
 
     assign pc_nxt = br_e ? br_addr : pc + 4'h4;
 
-    assign inst_sram_en     = br_e ? 1'b0 : 1'b1;
+    assign inst_sram_en     = br_e ? 1'b0 : pc_valid ;
     assign inst_sram_we     = 8'b0;
     assign inst_sram_addr   = pc;//我认为这里应该访问pc_nxt
     assign inst_sram_wdata  = 64'b0;
