@@ -13,7 +13,7 @@ module WB
     output wire [WB2EX_WD-1:0] wb2ex_fwd,
 
     output wire [63:0]  debug_wb_pc,
-    output wire [3:0]   debug_wb_rf_we,
+    output wire [7:0]   debug_wb_rf_we,
     output wire [4:0]   debug_wb_rf_wnum,
     output wire [63:0]  debug_wb_rf_wdata
 );

@@ -1,9 +1,9 @@
-`define ID2EX_WD 300
-`define EX2MEM_WD 300
-`define MEM2WB_WD 300
-`define WB2RF_WD 300
-`define MEM2EX_WD 300
-`define WB2EX_WD 300
+`define ID2EX_WD 600
+`define EX2MEM_WD 600
+`define MEM2WB_WD 600
+`define WB2RF_WD 600
+`define MEM2EX_WD 600
+`define WB2EX_WD 600
 module mycpu_top(
     input  wire clk,
     input  wire rst_n,

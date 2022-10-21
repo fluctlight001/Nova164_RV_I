@@ -24,7 +24,7 @@ module IF(
     always @ (posedge clk) begin
         if (!rst_n) begin
             pc_valid <= 1'b0;
-            pc <= 64'h800f_fffc;
+            pc <= 64'h7fff_fffc;
         end
         else if (!stall[0]) begin
             pc_valid <= 1'b1;

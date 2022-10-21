@@ -71,9 +71,9 @@ module ID
     wire [31:0] inst;
     wire [63:0] inst_tmp;
     assign inst_tmp = stall_flag ? inst_r : inst_sram_rdata;
-    assign inst = pc_r[3] ? inst_tmp[63:32] : inst_tmp[31:0];
+    assign inst = pc_r[2] ? inst_tmp[63:32] : inst_tmp[31:0];
 
-    decoder_i u_decoder_i(
+    decoder_64i u_decoder_64i(
     	.inst       (inst       ),
 
         .sel_src1   (sel_src1   ),

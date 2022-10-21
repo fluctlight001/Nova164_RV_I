@@ -29,9 +29,10 @@ module decoder_64i (
     wire [15:0] opcode_l, funct7_l;
     wire [7:0] opcode_h, funct7_h;
     wire [4:0] rd, shamt5;
+    wire [5:0] shamt6;
     wire [2:0] funct3;
     wire [7:0] funct3_d;
-    wire [31:0] imm_i, imm_s, imm_b, imm_u, imm_j;
+    wire [63:0] imm_i, imm_s, imm_b, imm_u, imm_j;
 
     wire inst_sll, inst_slli, inst_srl, inst_srli, inst_sra, inst_srai;
     wire inst_add, inst_addi, inst_sub, inst_lui, inst_auipc;
