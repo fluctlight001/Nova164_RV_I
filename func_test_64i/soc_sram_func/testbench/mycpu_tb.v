@@ -33,6 +33,7 @@ THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 `timescale 1ns / 1ps
 
 `define TRACE_REF_FILE "../../../../../../../cpu132_gettrace/ans/addiw-riscv64-nemu.ans"
+`define SOURCE_FILE "../../../../../../../cpu132_gettrace/data/addiw-riscv64-nemu.data"
 `define CONFREG_OPEN_TRACE   1'b1
 `define END_PC 32'hbfc00100
 
@@ -81,12 +82,6 @@ assign debug_wb_rf_wdata_v[23:16] = debug_wb_rf_wdata[23:16] & {8{debug_wb_rf_we
 assign debug_wb_rf_wdata_v[15: 8] = debug_wb_rf_wdata[15: 8] & {8{debug_wb_rf_wen[1]}};
 assign debug_wb_rf_wdata_v[7 : 0] = debug_wb_rf_wdata[7 : 0] & {8{debug_wb_rf_wen[0]}};
 
-// open the trace file;
-integer trace_ref;
-initial begin
-    trace_ref = $fopen(`TRACE_REF_FILE, "r");
-end
-
 //get reference result in falling edge
 reg        trace_cmp_flag;
 reg        debug_end;
@@ -96,6 +91,32 @@ reg [4 :0] ref_wb_rf_wnum;
 reg [63:0] ref_wb_rf_wdata_v;
 reg [63:0] debug_rf [31:0];
 reg [31:0] line;
+
+// open the trace file;
+integer trace_ref;
+reg [31:0] ref_line;
+reg trash;
+initial begin
+    trash = 1'b1;
+    trace_ref = $fopen(`TRACE_REF_FILE, "r");
+    $fscanf(trace_ref, "%d", ref_line);
+    // ref_line = 111;
+    $readmemh(`SOURCE_FILE,soc_lite_top.inst_ram.mem);//TODO
+    $readmemh(`SOURCE_FILE,soc_lite_top.data_ram.mem);//TODO
+    
+    // #5000
+    while(ref_line!==line) begin
+        #10
+        trash = ~trash;
+    end
+    // $display("%d,%d",ref_line,line);
+    if (ref_line==line) begin
+        $display("test finish!");
+        $finish;
+    end
+end
+
+
 
 always @(posedge soc_clk)
 begin 
