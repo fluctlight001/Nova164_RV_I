@@ -32,7 +32,7 @@ THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ------------------------------------------------------------------------------*/
 `timescale 1ns / 1ps
 
-`define TRACE_REF_FILE "../../../../../../../cpu132_gettrace/ans/add-riscv64-nemu.ans"
+`define TRACE_REF_FILE "../../../../../../../cpu132_gettrace/ans/addiw-riscv64-nemu.ans"
 `define CONFREG_NUM_REG      soc_lite.confreg.num_data
 `define CONFREG_OPEN_TRACE   soc_lite.confreg.open_trace
 `define CONFREG_NUM_MONITOR  soc_lite.confreg.num_monitor
@@ -90,7 +90,7 @@ soc_lite_top #(.SIMULATION(1'b1)) soc_lite
 //"w" in "wen/wnum/wdata" means writing
 wire soc_clk;
 wire [63:0] debug_wb_pc;
-wire [3 :0] debug_wb_rf_wen;
+wire [7 :0] debug_wb_rf_wen;
 wire [4 :0] debug_wb_rf_wnum;
 wire [63:0] debug_wb_rf_wdata;
 assign soc_clk           = soc_lite.cpu_clk;
@@ -101,6 +101,10 @@ assign debug_wb_rf_wdata = soc_lite.debug_wb_rf_wdata;
 
 //wdata[i*8+7 : i*8] is valid, only wehile wen[i] is valid
 wire [63:0] debug_wb_rf_wdata_v;
+assign debug_wb_rf_wdata_v[63:56] = debug_wb_rf_wdata[63:56] & {8{debug_wb_rf_wen[7]}};
+assign debug_wb_rf_wdata_v[55:48] = debug_wb_rf_wdata[55:48] & {8{debug_wb_rf_wen[6]}};
+assign debug_wb_rf_wdata_v[47:40] = debug_wb_rf_wdata[47:40] & {8{debug_wb_rf_wen[5]}};
+assign debug_wb_rf_wdata_v[39:32] = debug_wb_rf_wdata[39:32] & {8{debug_wb_rf_wen[4]}};
 assign debug_wb_rf_wdata_v[31:24] = debug_wb_rf_wdata[31:24] & {8{debug_wb_rf_wen[3]}};
 assign debug_wb_rf_wdata_v[23:16] = debug_wb_rf_wdata[23:16] & {8{debug_wb_rf_wen[2]}};
 assign debug_wb_rf_wdata_v[15: 8] = debug_wb_rf_wdata[15: 8] & {8{debug_wb_rf_wen[1]}};
