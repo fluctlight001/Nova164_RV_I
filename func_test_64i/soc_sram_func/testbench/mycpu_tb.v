@@ -89,10 +89,10 @@ soc_lite_top #(.SIMULATION(1'b1)) soc_lite
 //"rf" means regfiles in cpu
 //"w" in "wen/wnum/wdata" means writing
 wire soc_clk;
-wire [31:0] debug_wb_pc;
+wire [63:0] debug_wb_pc;
 wire [3 :0] debug_wb_rf_wen;
 wire [4 :0] debug_wb_rf_wnum;
-wire [31:0] debug_wb_rf_wdata;
+wire [63:0] debug_wb_rf_wdata;
 assign soc_clk           = soc_lite.cpu_clk;
 assign debug_wb_pc       = soc_lite.debug_wb_pc;
 assign debug_wb_rf_wen   = soc_lite.debug_wb_rf_wen;
@@ -100,7 +100,7 @@ assign debug_wb_rf_wnum  = soc_lite.debug_wb_rf_wnum;
 assign debug_wb_rf_wdata = soc_lite.debug_wb_rf_wdata;
 
 //wdata[i*8+7 : i*8] is valid, only wehile wen[i] is valid
-wire [31:0] debug_wb_rf_wdata_v;
+wire [63:0] debug_wb_rf_wdata_v;
 assign debug_wb_rf_wdata_v[31:24] = debug_wb_rf_wdata[31:24] & {8{debug_wb_rf_wen[3]}};
 assign debug_wb_rf_wdata_v[23:16] = debug_wb_rf_wdata[23:16] & {8{debug_wb_rf_wen[2]}};
 assign debug_wb_rf_wdata_v[15: 8] = debug_wb_rf_wdata[15: 8] & {8{debug_wb_rf_wen[1]}};
@@ -118,8 +118,8 @@ reg        debug_end;
 
 reg [31:0] ref_wb_pc;
 reg [4 :0] ref_wb_rf_wnum;
-reg [31:0] ref_wb_rf_wdata_v;
-reg [31:0] debug_rf [31:0];
+reg [63:0] ref_wb_rf_wdata_v;
+reg [63:0] debug_rf [31:0];
 reg [31:0] line;
 
 always @(posedge soc_clk)
