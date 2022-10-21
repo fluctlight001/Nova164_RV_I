@@ -45,29 +45,29 @@ THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //   > Author      : LOONGSON
 //   > Date        : 2017-08-04
 //*************************************************************************
-`define CONF_ADDR_BASE 32'h1faf_0000
-`define CONF_ADDR_MASK 32'hffff_0000
+`define CONF_ADDR_BASE 64'h0000_0000_1faf_0000
+`define CONF_ADDR_MASK 64'h0000_0000_ffff_0000
 module bridge_1x2(                                 
     input                           clk,          // clock 
     input                           resetn,       // reset, active low
     // master : cpu data
     input                           cpu_data_en,      // cpu data access enable
-    input  [3                   :0] cpu_data_wen,     // cpu data write byte enable
-    input  [31                  :0] cpu_data_addr,    // cpu data address
-    input  [31                  :0] cpu_data_wdata,   // cpu data write data
-    output [31                  :0] cpu_data_rdata,   // cpu data read data
+    input  [7                   :0] cpu_data_wen,     // cpu data write byte enable
+    input  [63                  :0] cpu_data_addr,    // cpu data address
+    input  [63                  :0] cpu_data_wdata,   // cpu data write data
+    output [63                  :0] cpu_data_rdata,   // cpu data read data
     // slave : data ram 
     output                          data_sram_en,     // access data_sram enable
-    output [3                   :0] data_sram_wen,    // write enable 
-    output [31                  :0] data_sram_addr,   // address
-    output [31                  :0] data_sram_wdata,  // data in
-    input  [31                  :0] data_sram_rdata,  // data out
+    output [7                   :0] data_sram_wen,    // write enable 
+    output [63                  :0] data_sram_addr,   // address
+    output [63                  :0] data_sram_wdata,  // data in
+    input  [63                  :0] data_sram_rdata,  // data out
     // slave : confreg 
     output                          conf_en,          // access confreg enable 
-    output [3                   :0] conf_wen,         // access confreg enable 
-    output [31                  :0] conf_addr,        // address
-    output [31                  :0] conf_wdata,       // write data
-    input  [31                  :0] conf_rdata        // read data
+    output [7                   :0] conf_wen,         // access confreg enable 
+    output [63                  :0] conf_addr,        // address
+    output [63                  :0] conf_wdata,       // write data
+    input  [63                  :0] conf_rdata        // read data
 );
     wire sel_sram;  // cpu data is from data ram
     wire sel_conf;  // cpu data is from confreg
@@ -104,8 +104,8 @@ module bridge_1x2(
         end
     end
 
-    assign cpu_data_rdata = {32{sel_sram_r}} & data_sram_rdata
-                          | {32{sel_conf_r}} & conf_rdata;
+    assign cpu_data_rdata = {64{sel_sram_r}} & data_sram_rdata
+                          | {64{sel_conf_r}} & conf_rdata;
 
 endmodule
 
