@@ -121,18 +121,6 @@ wire [63:0] cpu_data_addr;
 wire [63:0] cpu_data_wdata;
 wire [63:0] cpu_data_rdata;
 
-//data sram
-wire        data_sram_en;
-wire [7 :0] data_sram_wen;
-wire [63:0] data_sram_addr;
-wire [63:0] data_sram_wdata;
-wire [63:0] data_sram_rdata;
-//conf
-wire        conf_en;
-wire [7 :0] conf_wen;
-wire [63:0] conf_addr;
-wire [63:0] conf_wdata;
-wire [63:0] conf_rdata;
 
 //cpu
 mycpu_top cpu(
@@ -170,60 +158,15 @@ inst_ram inst_ram
     .douta (cpu_inst_rdata     )    //63:0
 );
 
-bridge_1x2 bridge_1x2(
-    .clk             ( cpu_clk         ), // i, 1                 
-    .resetn          ( cpu_resetn      ), // i, 1                 
-
-    .cpu_data_en     ( cpu_data_en     ), // i, 1                 
-    .cpu_data_wen    ( cpu_data_wen    ), // i, 8                 
-    .cpu_data_addr   ( cpu_data_addr   ), // i, 64                
-    .cpu_data_wdata  ( cpu_data_wdata  ), // i, 64                
-    .cpu_data_rdata  ( cpu_data_rdata  ), // o, 64                
-
-    .data_sram_en    ( data_sram_en    ), // o, 1                 
-    .data_sram_wen   ( data_sram_wen   ), // o, 8                 
-    .data_sram_addr  ( data_sram_addr  ), // o, 64
-    .data_sram_wdata ( data_sram_wdata ), // o, 64                
-    .data_sram_rdata ( data_sram_rdata ), // i, 64                
-
-    .conf_en         ( conf_en         ), // o, 1                 
-    .conf_wen        ( conf_wen        ), // o, 4                 
-    .conf_addr       ( conf_addr       ), // o, 64                
-    .conf_wdata      ( conf_wdata      ), // o, 64                
-    .conf_rdata      ( conf_rdata      )  // i, 64                
- );
-
 //data ram
 data_ram data_ram
 (
-    .clka  (cpu_clk             ),   
-    .ena   (data_sram_en        ),
-    .wea   (data_sram_wen       ),   //7:0
-    .addra (data_sram_addr[16:3]),   //15:0
-    .dina  (data_sram_wdata     ),   //63:0
-    .douta (data_sram_rdata     )    //63:0
-);
-
-//confreg
-confreg #(.SIMULATION(SIMULATION)) confreg
-(
-    .clk         ( cpu_clk    ),  // i, 1   
-    .timer_clk   ( timer_clk  ),  // i, 1   
-    .resetn      ( cpu_resetn ),  // i, 1    
-    .conf_en     ( conf_en    ),  // i, 1      
-    .conf_wen    ( conf_wen   ),  // i, 4      
-    .conf_addr   ( conf_addr  ),  // i, 64        
-    .conf_wdata  ( conf_wdata ),  // i, 64         
-    .conf_rdata  ( conf_rdata ),  // o, 64         
-    .led         ( led        ),  // o, 16   
-    .led_rg0     ( led_rg0    ),  // o, 2      
-    .led_rg1     ( led_rg1    ),  // o, 2      
-    .num_csn     ( num_csn    ),  // o, 8      
-    .num_a_g     ( num_a_g    ),  // o, 7      
-    .switch      ( switch     ),  // i, 8     
-    .btn_key_col ( btn_key_col),  // o, 4          
-    .btn_key_row ( btn_key_row),  // i, 4           
-    .btn_step    ( btn_step   )   // i, 2   
+    .clka  (cpu_clk            ),   
+    .ena   (cpu_data_en        ),
+    .wea   (cpu_data_wen       ),   //7:0
+    .addra (cpu_data_addr[16:3]),   //15:0
+    .dina  (cpu_data_wdata     ),   //63:0
+    .douta (cpu_data_rdata     )    //63:0
 );
 
 endmodule
