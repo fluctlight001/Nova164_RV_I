@@ -8,7 +8,7 @@ module decoder_64i (
     output wire [63:0] imm,
 
     // alu part
-    output wire [9:0] alu_op,
+    output wire [12:0] alu_op,
 
     // bru part
     output wire [7:0] bru_op,
@@ -50,6 +50,7 @@ module decoder_64i (
     wire op_add, op_sub, op_sll, op_slt;
     wire op_sltu, op_xor, op_srl, op_sra;
     wire op_or, op_and;
+    wire op_sllw, op_srlw, op_sraw;
 
     assign opcode = inst[6:0];
     assign rd = inst[11:7];
@@ -156,12 +157,15 @@ module decoder_64i (
     
     assign op_add = inst_add | inst_addw | inst_addi | inst_addiw | inst_lui | inst_auipc;
     assign op_sub = inst_sub | inst_subw;
-    assign op_sll = inst_sll | inst_sllw | inst_slli | inst_slliw;
+    assign op_sll = inst_sll | inst_slli;
+    assign op_sllw = inst_sllw | inst_slliw;
     assign op_slt = inst_slt | inst_slti;
     assign op_sltu = inst_sltu | inst_sltiu;
     assign op_xor = inst_xor | inst_xori;
-    assign op_srl = inst_srl | inst_srlw | inst_srli | inst_srliw;
-    assign op_sra = inst_sra | inst_sraw | inst_srai | inst_sraiw;
+    assign op_srl = inst_srl | inst_srli;
+    assign op_srlw = inst_srlw | inst_srliw;
+    assign op_sra = inst_sra | inst_srai;
+    assign op_sraw = inst_sraw | inst_sraiw;
     assign op_or = inst_or | inst_ori;
     assign op_and = inst_and | inst_andi;
 
@@ -171,8 +175,8 @@ module decoder_64i (
     wire data_unsigned;
 
     assign alu_op = {
-        op_add, op_sub, op_sll, op_slt,
-        op_sltu, op_xor, op_srl, op_sra,
+        op_add, op_sub, op_sll, op_sllw, op_slt,
+        op_sltu, op_xor, op_srl, op_srlw, op_sra, op_sraw,
         op_or, op_and
     };
 

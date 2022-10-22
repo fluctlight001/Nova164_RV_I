@@ -31,9 +31,10 @@ THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 --------------------------------------------------------------------------------
 ------------------------------------------------------------------------------*/
 `timescale 1ns / 1ps
-
-`define TRACE_REF_FILE "../../../../../../../cpu132_gettrace/ans/addiw-riscv64-nemu.ans"
-`define SOURCE_FILE "../../../../../../../cpu132_gettrace/data/addiw-riscv64-nemu.data"
+`define TEST_NAME "srlw"
+`define LINE_NUM 287
+`define TRACE_REF_FILE {"../../../../../../../cpu132_gettrace/ans/",`TEST_NAME,"-riscv64-nemu.ans"}
+`define SOURCE_FILE {"../../../../../../../cpu132_gettrace/data/",`TEST_NAME,"-riscv64-nemu.data"}
 `define CONFREG_OPEN_TRACE   1'b1
 `define END_PC 32'hbfc00100
 
@@ -99,10 +100,10 @@ reg trash;
 initial begin
     trash = 1'b1;
     trace_ref = $fopen(`TRACE_REF_FILE, "r");
-    $fscanf(trace_ref, "%d", ref_line);
-    // ref_line = 111;
-    $readmemh(`SOURCE_FILE,soc_lite_top.inst_ram.mem);//TODO
-    $readmemh(`SOURCE_FILE,soc_lite_top.data_ram.mem);//TODO
+    // $fscanf(trace_ref, "%d", ref_line);
+    ref_line = `LINE_NUM;
+    $readmemh(`SOURCE_FILE,soc_lite.inst_ram.mem);//TODO
+    $readmemh(`SOURCE_FILE,soc_lite.data_ram.mem);//TODO
     
     // #5000
     while(ref_line!==line) begin
@@ -111,7 +112,7 @@ initial begin
     end
     // $display("%d,%d",ref_line,line);
     if (ref_line==line) begin
-        $display("test finish!");
+        $display("test ",`TEST_NAME," finish!");
         $finish;
     end
 end

@@ -40,7 +40,7 @@ module EX
     wire sel_src2;
     wire [4:0] rs1, rs2;
     wire [63:0] imm;
-    wire [9:0] alu_op;
+    wire [12:0] alu_op;
     wire [7:0] bru_op;
     wire [6:0] lsu_op;
     wire [9:0] csr_op;

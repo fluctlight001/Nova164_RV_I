@@ -73,7 +73,7 @@ module MEM
                     data_ram_sel[1] ? data_sram_rdata[15: 8] :
                     data_ram_sel[0] ? data_sram_rdata[ 7: 0] : 8'b0;
     assign h_data = data_ram_sel[6] ? data_sram_rdata[63:48] :
-                    data_ram_sel[4] ? data_sram_rdata[47: 0] :
+                    data_ram_sel[4] ? data_sram_rdata[47:32] :
                     data_ram_sel[2] ? data_sram_rdata[31:16] :
                     data_ram_sel[0] ? data_sram_rdata[15: 0] : 16'b0;
     assign w_data = data_ram_sel[4] ? data_sram_rdata[63:32] : 

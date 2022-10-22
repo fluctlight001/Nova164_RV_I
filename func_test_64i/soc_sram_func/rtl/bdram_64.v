@@ -32,9 +32,9 @@ wire[7:0] memw_1 = wea[1] ? dina[15:8]   : mem_1;
 wire[7:0] memw_2 = wea[2] ? dina[23:16]  : mem_2;
 wire[7:0] memw_3 = wea[3] ? dina[31:24]  : mem_3;
 wire[7:0] memw_4 = wea[4] ? dina[39:32]  : mem_4;
-wire[7:0] memw_5 = wea[4] ? dina[47:40]  : mem_5;
-wire[7:0] memw_6 = wea[4] ? dina[55:48]  : mem_6;
-wire[7:0] memw_7 = wea[4] ? dina[63:56]  : mem_7;
+wire[7:0] memw_5 = wea[5] ? dina[47:40]  : mem_5;
+wire[7:0] memw_6 = wea[6] ? dina[55:48]  : mem_6;
+wire[7:0] memw_7 = wea[7] ? dina[63:56]  : mem_7;
 
 wire [63:0] memw_data = {memw_7, memw_6, memw_5, memw_4, memw_3, memw_2, memw_1, memw_0};
 
