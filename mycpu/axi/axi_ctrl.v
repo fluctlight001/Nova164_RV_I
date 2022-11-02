@@ -132,7 +132,7 @@ module axi_ctrl #(
                         core_axi_ar_len_o <= 0;
                         core_axi_ar_size_o <= 3'b111;
                         core_axi_ar_burst_o <= 0;
-                        state <= state << 3;
+                        state <= state << 4;
                     end
                     else if (data_sram_en & (|data_sram_we)) begin
                         core_axi_aw_valid_o <= 1'b1;
@@ -146,7 +146,7 @@ module axi_ctrl #(
                         core_axi_w_data_o <= data_sram_wdata;
                         core_axi_w_strb_o <= data_sram_we;
                         core_axi_w_last_o <= 1'b1;
-                        state <= state << 5;
+                        state <= state << 6;
                     end
                     else begin
                         state <= 0;
@@ -162,23 +162,51 @@ module axi_ctrl #(
                     if (core_axi_r_valid_i & core_axi_r_last_i) begin
                         core_axi_r_ready_o <= 1'b1;
                         inst_sram_rdata <= core_axi_r_data_i;
-                        state <= 0;
+                        state <= state << 1;
                     end
                 end
                 state[4]:begin
+                    if (data_sram_en & ~(|data_sram_we)) begin
+                        core_axi_ar_valid_o <= 1'b1;
+                        core_axi_ar_addr_o <= {data_sram_addr[31:3],3'b0};
+                        core_axi_ar_id_o <= 2;
+                        core_axi_ar_len_o <= 0;
+                        core_axi_ar_size_o <= 3'b111;
+                        core_axi_ar_burst_o <= 0;
+                        state <= state << 1;
+                    end
+                    else if (data_sram_en & (|data_sram_we)) begin
+                        core_axi_aw_valid_o <= 1'b1;
+                        core_axi_aw_addr_o <= {data_sram_addr[31:3],3'b0};
+                        core_axi_aw_id_o <= 3;
+                        core_axi_aw_len_o <= 0;
+                        core_axi_aw_size_o <= 3'b111;
+                        core_axi_aw_burst_o <= 0;
+
+                        core_axi_w_valid_o <= 1'b1;
+                        core_axi_w_data_o <= data_sram_wdata;
+                        core_axi_w_strb_o <= data_sram_we;
+                        core_axi_w_last_o <= 1'b1;
+                        state <= state << 3;
+                    end
+                    else begin
+                        state <= 0;
+                    end
+                end
+                state[5]:begin
                     if (core_axi_ar_ready_i) begin
                         core_axi_ar_valid_o <= 1'b0;
                         state <= state << 1;
                     end
                 end
-                state[5]:begin
+                state[6]:begin
                     if (core_axi_r_valid_i & core_axi_r_last_i) begin
                         core_axi_r_ready_o <= 1'b1;
                         data_sram_rdata <= core_axi_r_data_i;
                         state <= 0;
                     end
                 end
-                state[6]:begin
+                state[7]:begin
                     if (core_axi_aw_ready_i) begin
                         core_axi_aw_valid_o <= 1'b0;
                     end
@@ -189,7 +217,7 @@ module axi_ctrl #(
                         state <= state << 1;
                     end
                 end
-                state[7]:begin
+                state[8]:begin
                     if (core_axi_b_valid_i) begin
                         core_axi_b_ready_o <= 1'b1;
                         state <= 0;
