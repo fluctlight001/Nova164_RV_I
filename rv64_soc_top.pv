@@ -26,17 +26,20 @@ wire                              master_axi_aw_lock    ;
 wire [3:0]                        master_axi_aw_cache   ;
 wire [3:0]                        master_axi_aw_qos     ;
 wire [3:0]                        master_axi_aw_region  ;
+
 wire                              master_axi_w_ready    ;
 wire                              master_axi_w_valid    ;
 wire [AXI_DATA_WIDTH-1:0]         master_axi_w_data     ;
 wire [AXI_DATA_WIDTH/8-1:0]       master_axi_w_strb     ;
 wire                              master_axi_w_last     ;
 wire [AXI_USER_WIDTH-1:0]         master_axi_w_user     ;
+
 wire                              master_axi_b_ready    ;
 wire                              master_axi_b_valid    ;
 wire [1:0]                        master_axi_b_resp     ;
 wire [AXI_ID_WIDTH-1:0]           master_axi_b_id       ;
 wire [AXI_USER_WIDTH-1:0]         master_axi_b_user     ;
+
 wire                              master_axi_ar_ready   ;
 wire                              master_axi_ar_valid   ;
 wire [AXI_ADDR_WIDTH-1:0]         master_axi_ar_addr    ;
@@ -50,6 +53,7 @@ wire                              master_axi_ar_lock    ;
 wire [3:0]                        master_axi_ar_cache   ;
 wire [3:0]                        master_axi_ar_qos     ;
 wire [3:0]                        master_axi_ar_region  ;
+
 wire                              master_axi_r_ready    ;
 wire                              master_axi_r_valid    ;
 wire [1:0]                        master_axi_r_resp     ;
@@ -128,17 +132,20 @@ core #(
 .core_axi_aw_cache_o       (master_axi_aw_cache ),
 .core_axi_aw_qos_o         (master_axi_aw_qos   ),
 .core_axi_aw_region_o      (master_axi_aw_region),
+
 .core_axi_w_ready_i        (master_axi_w_ready  ),
 .core_axi_w_valid_o        (master_axi_w_valid  ),
 .core_axi_w_data_o         (master_axi_w_data   ),
 .core_axi_w_strb_o         (master_axi_w_strb   ),
 .core_axi_w_last_o         (master_axi_w_last   ),
 .core_axi_w_user_o         (master_axi_w_user   ),
+
 .core_axi_b_ready_o        (master_axi_b_ready  ),
 .core_axi_b_valid_i        (master_axi_b_valid  ),
 .core_axi_b_resp_i         (master_axi_b_resp   ),
 .core_axi_b_id_i           (master_axi_b_id     ),
 .core_axi_b_user_i         (master_axi_b_user   ),
+
 .core_axi_ar_ready_i       (master_axi_ar_ready ),
 .core_axi_ar_valid_o       (master_axi_ar_valid ),
 .core_axi_ar_addr_o        (master_axi_ar_addr  ),
@@ -152,6 +159,7 @@ core #(
 .core_axi_ar_cache_o       (master_axi_ar_cache ),
 .core_axi_ar_qos_o         (master_axi_ar_qos   ),
 .core_axi_ar_region_o      (master_axi_ar_region),
+
 .core_axi_r_ready_o        (master_axi_r_ready  ),
 .core_axi_r_valid_i        (master_axi_r_valid  ),
 .core_axi_r_resp_i         (master_axi_r_resp   ),
