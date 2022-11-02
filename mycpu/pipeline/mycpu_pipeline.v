@@ -10,6 +10,7 @@ module mycpu_pipeline
 )(
     input  wire clk,
     input  wire rst_n,
+    input  wire stallreq_axi,
 
     output wire         inst_sram_en,
     output wire [7:0]   inst_sram_we,
@@ -131,6 +132,7 @@ module mycpu_pipeline
     	.rst_n         (rst_n         ),
         .stallreq_id   (stallreq_id   ),
         .stallreq_ex   (stallreq_ex   ),
+        .stallreq_axi  (stallreq_axi  ),
         .stall         (stall         )
     );
     
