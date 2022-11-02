@@ -31,7 +31,7 @@ THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 --------------------------------------------------------------------------------
 ------------------------------------------------------------------------------*/
 `timescale 1ns / 1ps
-`define TEST_NAME "srlw"
+`define TEST_NAME "add"
 `define LINE_NUM 287
 `define TRACE_REF_FILE {"../../../../../../../cpu132_gettrace/ans/",`TEST_NAME,"-riscv64-nemu.ans"}
 `define SOURCE_FILE {"../../../../../../../cpu132_gettrace/data/",`TEST_NAME,"-riscv64-nemu.data"}
@@ -102,8 +102,8 @@ initial begin
     trace_ref = $fopen(`TRACE_REF_FILE, "r");
     // $fscanf(trace_ref, "%d", ref_line);
     ref_line = `LINE_NUM;
-    $readmemh(`SOURCE_FILE,soc_lite.inst_ram.mem);//TODO
-    $readmemh(`SOURCE_FILE,soc_lite.data_ram.mem);//TODO
+    $readmemh(`SOURCE_FILE,soc_lite.u_axi4_slave.u_ram.mem);//TODO
+    // $readmemh(`SOURCE_FILE,soc_lite.data_ram.mem);//TODO
     
     // #5000
     while(ref_line!==line) begin
