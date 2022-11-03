@@ -25,10 +25,13 @@ module EX
 
     reg [ID2EX_WD-1:0] id2ex_bus_r;
     always @ (posedge clk) begin
-        if (!rst_n | br_bus[64]) begin
+        if (!rst_n) begin
             id2ex_bus_r <= 0;
         end
         else if (stall[2]&(!stall[3])) begin
+            id2ex_bus_r <= 0;
+        end
+        else if (!stall[2]&br_bus[64]) begin
             id2ex_bus_r <= 0;
         end
         else if (!stall[2]) begin

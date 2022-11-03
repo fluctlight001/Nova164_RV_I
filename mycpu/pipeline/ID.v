@@ -34,11 +34,15 @@ module ID
     wire [4:0] rf_waddr;
 
     always @ (posedge clk)begin
-        if (!rst_n | br_e) begin
+        if (!rst_n) begin
             pc_valid_r <= 1'b0;
             pc_r <= 64'b0;
         end
         else if (stall[1]&(!stall[2]))begin
+            pc_valid_r <= 1'b0;
+            pc_r <= 64'b0;
+        end
+        else if (!stall[1]&br_e) begin
             pc_valid_r <= 1'b0;
             pc_r <= 64'b0;
         end

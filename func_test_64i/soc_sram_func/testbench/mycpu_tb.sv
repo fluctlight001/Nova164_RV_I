@@ -31,10 +31,11 @@ THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 --------------------------------------------------------------------------------
 ------------------------------------------------------------------------------*/
 `timescale 1ns / 1ps
-`define TEST_NAME "srlw"
-`define LINE_NUM 287
-`define TRACE_REF_FILE {"../../../../../../../cpu132_gettrace/ans/",`TEST_NAME,"-riscv64-nemu.ans"}
-`define SOURCE_FILE {"../../../../../../../cpu132_gettrace/data/",`TEST_NAME,"-riscv64-nemu.data"}
+`define TEST_NAME "add"
+`define LINE_NUM 220
+`define TRACE_REF_FILE_PRFIX "../../../../../../../cpu132_gettrace/ans/"
+`define TRACE_REF_FILE {`TRACE_REF_FILE_PRFIX,`TEST_NAME,"-riscv64-nemu.ans"}
+`define SOURCE_FILE {`TRACE_REF_FILE_PRFIX,`TEST_NAME,"-riscv64-nemu.data"}
 `define CONFREG_OPEN_TRACE   1'b1
 `define END_PC 32'hbfc00100
 
@@ -42,13 +43,13 @@ module tb_top( );
 reg resetn;
 reg clk;
 
-initial
-begin
-    clk = 1'b0;
-    resetn = 1'b0;
-    #2000;
-    resetn = 1'b1;
-end
+// initial
+// begin
+//     clk = 1'b0;
+//     resetn = 1'b0;
+//     #2000;
+//     resetn = 1'b1;
+// end
 always #5 clk=~clk;
 soc_lite_top #(.SIMULATION(1'b1)) soc_lite
 (
@@ -97,13 +98,20 @@ reg [31:0] line;
 integer trace_ref;
 reg [31:0] ref_line;
 reg trash;
-initial begin
+
+task unit_test;
+input [64*8-1:0] test_name;
+input [9:0] test_line;
+begin
+    clk = 1'b0;
+    resetn = 1'b0;
+    #2000;
+    resetn = 1'b1;
+    $display("START TEST: %0s",test_name);
     trash = 1'b1;
-    trace_ref = $fopen(`TRACE_REF_FILE, "r");
-    // $fscanf(trace_ref, "%d", ref_line);
-    ref_line = `LINE_NUM;
-    $readmemh(`SOURCE_FILE,soc_lite.inst_ram.mem);//TODO
-    $readmemh(`SOURCE_FILE,soc_lite.data_ram.mem);//TODO
+    trace_ref = $fopen({"../../../../../../../cpu132_gettrace/ans/",test_name,"-riscv64-nemu.ans"}, "r");
+    ref_line = test_line;
+    $readmemh({"../../../../../../../cpu132_gettrace/data/",test_name,"-riscv64-nemu.data"},soc_lite.u_axi4_slave.u_ram.mem);//TODO
     
     // #5000
     while(ref_line!==line) begin
@@ -112,10 +120,11 @@ initial begin
     end
     // $display("%d,%d",ref_line,line);
     if (ref_line==line) begin
-        $display("test ",`TEST_NAME," finish!");
-        $finish;
+        $display("TEST PASS:%0s",test_name);
+        // $finish;
     end
 end
+endtask
 
 
 
@@ -198,5 +207,63 @@ begin
             debug_rf[debug_wb_rf_wnum] <= debug_wb_rf_wdata_v;
         end
     end
+end
+
+
+initial begin
+    unit_test("add",220);
+    unit_test("addi",115);
+    unit_test("addiw",111);
+    unit_test("addw",215);
+    unit_test("and",355);
+    unit_test("andi",113);
+    unit_test("auipc",15);
+    unit_test("beq",73);
+    unit_test("bge",80);
+    unit_test("bgeu",215);
+    unit_test("blt",72);
+    unit_test("bltu",205);
+    unit_test("bne",75);
+    unit_test("jal",9);
+    unit_test("jalr",46);
+    unit_test("lb",126);
+    unit_test("lbu",126);
+    unit_test("ld",266);
+    unit_test("lh",142);
+    unit_test("lhu",151);
+    unit_test("lui",15);
+    unit_test("lw",154);
+    unit_test("lwu",180);
+    unit_test("or",391);
+    unit_test("ori",108);
+    unit_test("sb",205);
+    unit_test("sd",401);
+    unit_test("sh",278);
+    // unit_test("simple",281);
+    unit_test("sll",281);
+    unit_test("slli",134);
+    unit_test("slliw",140);
+    unit_test("sllw",281);
+    unit_test("slt",196);
+    unit_test("slti",98);
+    unit_test("sltiu",98);
+    unit_test("sltu",213);
+    unit_test("sra",261);
+    unit_test("srai",133);
+    unit_test("sraiw",171);
+    unit_test("sraw",297);
+    unit_test("srl",327);
+    unit_test("srli",156);
+    unit_test("srliw",152);
+    unit_test("srlw",287);
+    unit_test("sub",211);
+    unit_test("subw",206);
+    unit_test("sw",289);
+    unit_test("xor",387);
+    unit_test("xori",106);
+
+
+    $display("-------ALL TEST FINISH-------- !!!");
+    $finish;
 end
 endmodule
