@@ -1,7 +1,7 @@
 module EX
 #(
-    parameter ID2EX_WD = 50,
-    parameter EX2MEM_WD = 50,
+    parameter ID2EX_WD = 49,
+    parameter EX2MEM_WD = 49,
     parameter MEM2EX_WD = 50,
     parameter WB2EX_WD = 50
 )(
@@ -47,7 +47,7 @@ module EX
     wire [7:0] bru_op;
     wire [6:0] lsu_op;
     wire [9:0] csr_op;
-    wire [2:0] sel_rf_res;
+    wire [1:0] sel_rf_res;
     wire rf_we;
     wire [4:0] rf_waddr;
     wire [63:0] pc;
@@ -129,8 +129,8 @@ module EX
     );
 
     wire [63:0] ex_result;
+
     assign ex_result    = sel_rf_res[0] ? br_result 
-                        : sel_rf_res[2] ? {{32{alu_result[31]}},alu_result[31:0]} //sext(alu_result[31:0])
                         : alu_result;
     
     assign ex2mem_bus = {

@@ -18,8 +18,7 @@ module lsu(
     wire data_unsigned;
 
     wire [7:0] byte_sel;
-
-    assign {
+assign {
         data_ram_en, data_ram_we, data_size_sel, data_unsigned
     } = lsu_op;
     
