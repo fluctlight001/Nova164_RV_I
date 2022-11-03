@@ -8,7 +8,7 @@ module decoder_64i (
     output wire [63:0] imm,
 
     // alu part
-    output wire [12:0] alu_op,
+    output wire [14:0] alu_op,
 
     // bru part
     output wire [7:0] bru_op,
@@ -18,13 +18,13 @@ module decoder_64i (
 
     // csr part
     output wire [9:0] csr_op,
-
-    output wire [2:0] sel_rf_res,
+    output wire [1:0] sel_rf_res,
 
     // wb stage 
     output wire rf_we,
     output wire [4:0] rf_waddr
 );
+    //defing slices
     wire [6:0] opcode, funct7;
     wire [15:0] opcode_l, funct7_l;
     wire [7:0] opcode_h, funct7_h;
@@ -34,6 +34,7 @@ module decoder_64i (
     wire [7:0] funct3_d;
     wire [63:0] imm_i, imm_s, imm_b, imm_u, imm_j;
 
+    //define inst
     wire inst_sll, inst_slli, inst_srl, inst_srli, inst_sra, inst_srai;
     wire inst_add, inst_addi, inst_sub, inst_lui, inst_auipc;
     wire inst_xor, inst_xori, inst_or, inst_ori, inst_and, inst_andi;
@@ -47,10 +48,23 @@ module decoder_64i (
     wire inst_addiw, inst_slliw, inst_srliw, inst_sraiw;
     wire inst_addw, inst_subw, inst_sllw, inst_srlw, inst_sraw;
 
-    wire op_add, op_sub, op_sll, op_slt;
-    wire op_sltu, op_xor, op_srl, op_sra;
-    wire op_or, op_and;
-    wire op_sllw, op_srlw, op_sraw;
+    //define alu operator
+    wire op_and;
+    wire op_or;
+    wire op_xor;
+    wire op_add;
+    wire op_sub;
+    wire op_slt;
+    wire op_sltu;
+    wire op_sll;
+    wire op_srl;
+    wire op_sra;
+    wire op_addw;
+    wire op_subw;
+    wire op_sllw;
+    wire op_srlw;
+    wire op_sraw;
+
 
     assign opcode = inst[6:0];
     assign rd = inst[11:7];
@@ -60,6 +74,7 @@ module decoder_64i (
     assign shamt5 = inst[24:20];
     assign shamt6 = inst[25:20];
     assign funct7 = inst[31:25]; 
+
     // sext(imm)
     assign imm_i = {{52{funct7[6]}}, funct7, rs2};
     assign imm_s = {{52{funct7[6]}}, funct7, rd};
@@ -93,6 +108,7 @@ module decoder_64i (
     );
     
 
+    //decode inst
     assign inst_lui     = opcode_h[3'b011] & opcode_l[4'b0111];
     assign inst_auipc   = opcode_h[3'b001] & opcode_l[4'b0111];
     assign inst_jal     = opcode_h[3'b110] & opcode_l[4'b1111];
@@ -155,29 +171,34 @@ module decoder_64i (
     assign inst_ebreak  = opcode_h[3'b111] & opcode_l[4'b0011] & ~(|inst[31:21]) & inst[20] & ~(|inst[19:7]);
 
     
-    assign op_add = inst_add | inst_addw | inst_addi | inst_addiw | inst_lui | inst_auipc;
-    assign op_sub = inst_sub | inst_subw;
-    assign op_sll = inst_sll | inst_slli;
-    assign op_sllw = inst_sllw | inst_slliw;
+    //encode alu operator by inst type
+    assign op_and = inst_and | inst_andi;
+    assign op_or = inst_or | inst_ori;
+    assign op_xor = inst_xor | inst_xori;
+    assign op_add = inst_add | inst_addi | inst_lui | inst_auipc;
+    assign op_sub = inst_sub;
     assign op_slt = inst_slt | inst_slti;
     assign op_sltu = inst_sltu | inst_sltiu;
-    assign op_xor = inst_xor | inst_xori;
+    assign op_sll = inst_sll | inst_slli;
     assign op_srl = inst_srl | inst_srli;
-    assign op_srlw = inst_srlw | inst_srliw;
     assign op_sra = inst_sra | inst_srai;
+    assign op_addw = inst_addw | inst_addiw;
+    assign op_subw = inst_subw;
+    assign op_sllw = inst_sllw | inst_slliw;
+    assign op_srlw = inst_srlw | inst_srliw;
     assign op_sraw = inst_sraw | inst_sraiw;
-    assign op_or = inst_or | inst_ori;
-    assign op_and = inst_and | inst_andi;
 
+    //encode for access mem
     wire data_ram_en;
     wire data_ram_we;
     wire [3:0] data_size_sel;
     wire data_unsigned;
 
+    //make each operator into a bus, and transfer to other module
     assign alu_op = {
-        op_add, op_sub, op_sll, op_sllw, op_slt,
-        op_sltu, op_xor, op_srl, op_srlw, op_sra, op_sraw,
-        op_or, op_and
+      op_and, op_or, op_xor, op_add, op_sub, op_slt,
+      op_sltu, op_sll, op_srl, op_sra, op_addw, op_subw, 
+      op_sllw, op_srlw, op_sraw
     };
 
     assign bru_op = {
@@ -226,9 +247,6 @@ module decoder_64i (
     // shamt6
     assign sel_imm[6] = inst_slli | inst_srli | inst_srai;
 
-    /*这里我觉得立即数是根据指令类型来的，不如多一个把他们分类成某一个指令。
-    比如sel_imm改成type_?
-    */
 
     assign imm  = sel_imm[0] ? imm_i 
                 : sel_imm[1] ? imm_s
@@ -241,6 +259,7 @@ module decoder_64i (
     assign data_ram_en =  inst_lb | inst_lbu | inst_lh | inst_lhu | inst_lw | inst_lwu | inst_ld 
                         | inst_sb | inst_sh | inst_sw | inst_sd;
     assign data_ram_we = inst_sb | inst_sh | inst_sw | inst_sd;
+
     // byte
     assign data_size_sel[0] = inst_lb | inst_lbu | inst_sb;
     // half word
@@ -256,7 +275,7 @@ module decoder_64i (
     // rf_res from lsu
     assign sel_rf_res[1] = inst_lb | inst_lh | inst_lw | inst_ld | inst_lbu | inst_lhu | inst_lwu;
     // rf_res need sext(alu_result[31:0])
-    assign sel_rf_res[2] = inst_addiw | inst_slliw | inst_srliw | inst_sraiw | inst_addw | inst_subw | inst_sllw | inst_srlw | inst_sraw;
+    //assign sel_rf_res[2] = inst_addiw | inst_slliw | inst_srliw | inst_sraiw | inst_addw | inst_subw | inst_sllw | inst_srlw | inst_sraw;
 
     assign rf_we =  inst_lui | inst_auipc | inst_jal | inst_jalr |
                     inst_lb | inst_lh | inst_lw | inst_ld | inst_lbu | inst_lhu | inst_lwu |

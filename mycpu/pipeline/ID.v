@@ -1,8 +1,7 @@
 module ID
 #(
-    parameter ID2EX_WD = 50,
-    parameter WB2RF_WD = 50
-) (
+    parameter ID2EX_WD = 49,
+    parameter WB2RF_WD = 50) (
     input wire clk,
     input wire rst_n,
     input wire [5:0] stall,
@@ -22,16 +21,17 @@ module ID
 
     wire [1:0] sel_src1;
     wire sel_src2;
-    wire [4:0] rs1, rs2;
-    wire [63:0] imm;
-    wire [12:0] alu_op;
+    wire [1:0] sel_rf_res;
+    wire [14:0] alu_op;
     wire [7:0] bru_op;
     wire [6:0] lsu_op;
     wire [9:0] csr_op;
-    wire [2:0] sel_rf_res;
     wire rf_we;
-    wire [4:0] rf_waddr;
+
+    wire [4:0] rs1, rs2;
     wire [63:0] rdata1, rdata2;
+    wire [63:0] imm;
+    wire [4:0] rf_waddr;
 
     always @ (posedge clk)begin
         if (!rst_n | br_e) begin
@@ -50,6 +50,7 @@ module ID
 
     reg [63:0] inst_r;
     reg stall_flag;
+
     always @ (posedge clk) begin
         if (!rst_n) begin
             inst_r <= 64'b0;
@@ -70,24 +71,24 @@ module ID
 
     wire [31:0] inst;
     wire [63:0] inst_tmp;
+
     assign inst_tmp = stall_flag ? inst_r : inst_sram_rdata;
     assign inst = pc_r[2] ? inst_tmp[63:32] : inst_tmp[31:0];
 
     decoder_64i u_decoder_64i(
-    	.inst       (inst       ),
-
-        .sel_src1   (sel_src1   ),
-        .sel_src2   (sel_src2   ),
-        .rs1        (rs1        ),
-        .rs2        (rs2        ),
-        .imm        (imm        ),
-        .alu_op     (alu_op     ),
-        .bru_op     (bru_op     ),
-        .lsu_op     (lsu_op     ),
-        .csr_op     (csr_op     ),
-        .sel_rf_res (sel_rf_res ),
-        .rf_we      (rf_we      ),
-        .rf_waddr   (rf_waddr   )
+      .inst       (inst       ),
+      .sel_src1   (sel_src1   ),
+      .sel_src2   (sel_src2   ),
+      .rs1        (rs1        ),
+      .rs2        (rs2        ),
+      .imm        (imm        ),
+      .alu_op     (alu_op     ),
+      .bru_op     (bru_op     ),
+      .lsu_op     (lsu_op     ),
+      .csr_op     (csr_op     ),
+      .sel_rf_res (sel_rf_res ),
+      .rf_we      (rf_we      ),
+      .rf_waddr   (rf_waddr   )
     );
 
     wire wb_rf_we;
@@ -126,6 +127,7 @@ module ID
     };
 
     reg [6:0] ex_load_buffer;
+
     always @ (posedge clk) begin
         if (!rst_n) begin
             ex_load_buffer <= 7'b0;
@@ -137,6 +139,7 @@ module ID
             ex_load_buffer <= {sel_rf_res[1],rf_we,rf_waddr};
         end
     end
+
     wire ex_is_load;
     wire ex_rf_we;
     wire [4:0] ex_rf_waddr;

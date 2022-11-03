@@ -7,7 +7,6 @@ module MEM
     input wire clk,
     input wire rst_n,
     input wire [5:0] stall,
-
     input wire [EX2MEM_WD-1:0] ex2mem_bus,
     output wire [MEM2WB_WD-1:0] mem2wb_bus,
     output wire [MEM2EX_WD-1:0] mem2ex_fwd,
