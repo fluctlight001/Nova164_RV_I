@@ -81,6 +81,31 @@ module mycpu_top #(
     wire [63:0]  data_sram_wdata;
     wire [63:0]  data_sram_rdata;
 
+    // //cpu inst sram
+    // wire        cpu_inst_en;
+    // wire [7 :0] cpu_inst_wen;
+    // wire [63:0] cpu_inst_addr;
+    // wire [63:0] cpu_inst_wdata;
+    // wire [63:0] cpu_inst_rdata;
+    //cpu data sram
+    wire        cpu_data_en;
+    wire [7 :0] cpu_data_we;
+    wire [63:0] cpu_data_addr;
+    wire [63:0] cpu_data_wdata;
+    wire [63:0] cpu_data_rdata;
+    // // data sram 
+    // wire        data_sram_en;
+    // wire [7 :0] data_sram_wen;
+    // wire [63:0] data_sram_addr;
+    // wire [63:0] data_sram_wdata;
+    // wire [63:0] data_sram_rdata;
+    // confreg 
+    wire        conf_en;
+    wire [7 :0] conf_wen;
+    wire [63:0] conf_addr;
+    wire [63:0] conf_wdata;
+    wire [63:0] conf_rdata;
+
     wire stallreq_axi;
 
     mycpu_pipeline 
@@ -103,18 +128,54 @@ module mycpu_top #(
         .inst_sram_wdata   (inst_sram_wdata   ),
         .inst_sram_rdata   (inst_sram_rdata   ),
 
-        .data_sram_en      (data_sram_en      ),
-        .data_sram_we      (data_sram_we      ),
-        .data_sram_addr    (data_sram_addr    ),
-        .data_sram_wdata   (data_sram_wdata   ),
-        .data_sram_rdata   (data_sram_rdata   ),
+        .data_sram_en      (cpu_data_en      ),
+        .data_sram_we      (cpu_data_we      ),
+        .data_sram_addr    (cpu_data_addr    ),
+        .data_sram_wdata   (cpu_data_wdata   ),
+        .data_sram_rdata   (cpu_data_rdata   ),
 
         .debug_wb_pc       (debug_wb_pc       ),
         .debug_wb_rf_we    (debug_wb_rf_we    ),
         .debug_wb_rf_wnum  (debug_wb_rf_wnum  ),
         .debug_wb_rf_wdata (debug_wb_rf_wdata )
     );
-    
+
+    bridge_1x2 u_bridge_1x2(
+    .clk             (clk             ),
+    .resetn          (resetn          ),
+    .cpu_data_en     (cpu_data_en     ),
+    .cpu_data_wen    (cpu_data_we     ),
+    .cpu_data_addr   (cpu_data_addr   ),
+    .cpu_data_wdata  (cpu_data_wdata  ),
+    .cpu_data_rdata  (cpu_data_rdata  ),
+    .data_sram_en    (data_sram_en    ),
+    .data_sram_wen   (data_sram_we    ),
+    .data_sram_addr  (data_sram_addr  ),
+    .data_sram_wdata (data_sram_wdata ),
+    .data_sram_rdata (data_sram_rdata ),
+    .conf_en         (conf_en         ),
+    .conf_wen        (conf_wen        ),
+    .conf_addr       (conf_addr       ),
+    .conf_wdata      (conf_wdata      ),
+    .conf_rdata      (conf_rdata      )
+    );
+
+
+    confreg 
+    #(
+        .SIMULATION (1'b1 )
+    )
+    u_confreg(
+        .clk         (cpu_clk     ),
+        .timer_clk   (cpu_clk     ),
+        .resetn      (cpu_resetn  ),
+        .conf_en     (conf_en & ~stallreq_axi),
+        .conf_wen    (conf_wen    ),
+        .conf_addr   (conf_addr   ),
+        .conf_wdata  (conf_wdata  ),
+        .conf_rdata  (conf_rdata  )
+    );
+
     axi_ctrl 
     #(
         .AXI_DATA_WIDTH (AXI_DATA_WIDTH ),

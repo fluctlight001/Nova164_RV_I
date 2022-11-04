@@ -28,6 +28,28 @@ module MEM
         end
     end
 
+    reg [63:0] data_sram_rdata_r;
+    reg stall_flag;
+    always @ (posedge clk) begin
+        if (!rst_n) begin
+            data_sram_rdata_r <= 0;
+            stall_flag <= 1'b0;
+        end
+        else if (!stall[3]) begin
+            data_sram_rdata_r <= data_sram_rdata;
+            stall_flag <= 1'b0;
+        end
+        else if (stall_flag) begin
+            
+        end
+        else if (stall[3]&stall[4])begin
+            data_sram_rdata_r <= data_sram_rdata;
+            stall_flag <= 1'b1;
+        end
+    end
+    wire [63:0] data_tmp;
+    assign data_tmp = stall_flag ? data_sram_rdata_r : data_sram_rdata;
+
     wire [6:0] lsu_op;
     wire data_ram_en;
     wire data_ram_we;
@@ -64,21 +86,21 @@ module MEM
     wire [31:0] w_data;
     wire [63:0] d_data;
 
-    assign b_data = data_ram_sel[7] ? data_sram_rdata[63:56] :
-                    data_ram_sel[6] ? data_sram_rdata[55:48] :
-                    data_ram_sel[5] ? data_sram_rdata[47:40] :
-                    data_ram_sel[4] ? data_sram_rdata[39:32] :
-                    data_ram_sel[3] ? data_sram_rdata[31:24] :
-                    data_ram_sel[2] ? data_sram_rdata[23:16] :
-                    data_ram_sel[1] ? data_sram_rdata[15: 8] :
-                    data_ram_sel[0] ? data_sram_rdata[ 7: 0] : 8'b0;
-    assign h_data = data_ram_sel[6] ? data_sram_rdata[63:48] :
-                    data_ram_sel[4] ? data_sram_rdata[47:32] :
-                    data_ram_sel[2] ? data_sram_rdata[31:16] :
-                    data_ram_sel[0] ? data_sram_rdata[15: 0] : 16'b0;
-    assign w_data = data_ram_sel[4] ? data_sram_rdata[63:32] : 
-                    data_ram_sel[0] ? data_sram_rdata[31: 0] : 32'b0;
-    assign d_data = data_sram_rdata;
+    assign b_data = data_ram_sel[7] ? data_tmp[63:56] :
+                    data_ram_sel[6] ? data_tmp[55:48] :
+                    data_ram_sel[5] ? data_tmp[47:40] :
+                    data_ram_sel[4] ? data_tmp[39:32] :
+                    data_ram_sel[3] ? data_tmp[31:24] :
+                    data_ram_sel[2] ? data_tmp[23:16] :
+                    data_ram_sel[1] ? data_tmp[15: 8] :
+                    data_ram_sel[0] ? data_tmp[ 7: 0] : 8'b0;
+    assign h_data = data_ram_sel[6] ? data_tmp[63:48] :
+                    data_ram_sel[4] ? data_tmp[47:32] :
+                    data_ram_sel[2] ? data_tmp[31:16] :
+                    data_ram_sel[0] ? data_tmp[15: 0] : 16'b0;
+    assign w_data = data_ram_sel[4] ? data_tmp[63:32] : 
+                    data_ram_sel[0] ? data_tmp[31: 0] : 32'b0;
+    assign d_data = data_tmp;
 
     assign mem_result = data_size_sel[0] & data_unsigned ? {56'b0,b_data} :
                         data_size_sel[0] ? {{56{b_data[7]}},b_data} :
