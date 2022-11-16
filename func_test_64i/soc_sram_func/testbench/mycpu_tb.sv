@@ -37,6 +37,9 @@ THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 `define TRACE_REF_FILE {`TRACE_REF_FILE_PRFIX,`TEST_NAME,"-riscv64-nemu.ans"}
 `define SOURCE_FILE {`TRACE_REF_FILE_PRFIX,`TEST_NAME,"-riscv64-nemu.data"}
 `define CONFREG_OPEN_TRACE   1'b1
+`define CONFREG_NUM_MONITOR  1'b0
+`define CONFREG_UART_DISPLAY soc_lite.cpu.u_confreg.write_uart_valid
+`define CONFREG_UART_DATA    soc_lite.cpu.u_confreg.write_uart_data
 `define END_PC 32'hbfc00100
 
 module tb_top( );
@@ -103,16 +106,104 @@ task unit_test;
 input [64*8-1:0] test_name;
 input [9:0] test_line;
 begin
-    clk = 1'b0;
-    resetn = 1'b0;
-    #2000;
-    resetn = 1'b1;
-    $display("START TEST: %0s",test_name);
+    $display("START TEST : %0s",test_name);
     trash = 1'b1;
     trace_ref = $fopen({"../../../../../../../cpu132_gettrace/ans/",test_name,"-riscv64-nemu.ans"}, "r");
     ref_line = test_line;
     $readmemh({"../../../../../../../cpu132_gettrace/data/",test_name,"-riscv64-nemu.data"},soc_lite.u_axi4_slave.u_ram.mem);//TODO
     
+    clk = 1'b0;
+    resetn = 1'b0;
+    #2000;
+    resetn = 1'b1;
+
+    // #5000
+    while(ref_line!==line) begin
+        #10
+        trash = ~trash;
+    end
+    // $display("%d,%d",ref_line,line);
+    if (ref_line==line) begin
+        $display("TEST PASS:%0s",test_name);
+        // $finish;
+    end
+end
+endtask
+
+task unit_test_all;
+begin
+    unit_test("add",220);
+    unit_test("addi",115);
+    unit_test("addiw",111);
+    unit_test("addw",215);
+    unit_test("and",355);
+    unit_test("andi",113);
+    unit_test("auipc",15);
+    unit_test("beq",73);
+    unit_test("bge",80);
+    unit_test("bgeu",215);
+    unit_test("blt",72);
+    unit_test("bltu",205);
+    unit_test("bne",75);
+    unit_test("jal",9);
+    unit_test("jalr",46);
+    unit_test("lb",126);
+    unit_test("lbu",126);
+    unit_test("ld",266);
+    unit_test("lh",142);
+    unit_test("lhu",151);
+    unit_test("lui",15);
+    unit_test("lw",154);
+    unit_test("lwu",180);
+    unit_test("or",391);
+    unit_test("ori",108);
+    unit_test("sb",205);
+    unit_test("sd",401);
+    unit_test("sh",278);
+    // unit_test("simple",281);
+    unit_test("sll",281);
+    unit_test("slli",134);
+    unit_test("slliw",140);
+    unit_test("sllw",281);
+    unit_test("slt",196);
+    unit_test("slti",98);
+    unit_test("sltiu",98);
+    unit_test("sltu",213);
+    unit_test("sra",261);
+    unit_test("srai",133);
+    unit_test("sraiw",171);
+    unit_test("sraw",297);
+    unit_test("srl",327);
+    unit_test("srli",156);
+    unit_test("srliw",152);
+    unit_test("srlw",287);
+    unit_test("sub",211);
+    unit_test("subw",206);
+    unit_test("sw",289);
+    unit_test("xor",387);
+    unit_test("xori",106);
+
+
+    $display("-------ALL TEST FINISH-------- !!!");
+    $finish;
+end
+endtask
+
+task perf_test;
+input [64*8-1:0] test_name;
+input [200:0] test_line;
+begin
+    trash = 1'b1;
+    $display("START TEST : %0s",test_name);
+    trace_ref = $fopen({"../../../../../../../cpu132_gettrace/ans/",test_name,"-riscv64-nemu.ans"}, "r");
+    ref_line = test_line;
+    $readmemh({"../../../../../../../cpu132_gettrace/data/",test_name,"-riscv64-nemu.data"},soc_lite.u_axi4_slave.u_ram.mem);
+    
+    clk = 1'b0;
+    resetn = 1'b0;
+    #2000;
+    resetn = 1'b1;
+
     // #5000
     while(ref_line!==line) begin
         #10
@@ -209,60 +300,51 @@ begin
     end
 end
 
+//monitor test
+initial
+begin
+    $timeformat(-9,0," ns",10);
+    while(!resetn) #5;
+    $display("==============================================================");
+    $display("Test begin!");
+
+    #10000;
+    while(`CONFREG_NUM_MONITOR)
+    begin
+        #10000;
+        $display ("        [%t] Test is running, debug_wb_pc = 0x%8h",$time, debug_wb_pc);
+    end
+end
+
+//模拟串口打印
+wire uart_display;
+wire [7:0] uart_data;
+assign uart_display = `CONFREG_UART_DISPLAY;
+assign uart_data    = `CONFREG_UART_DATA;
+
+always @(posedge soc_clk)
+begin
+    if(uart_display)
+    begin
+        if(uart_data==8'hff)
+        begin
+            ;//$finish;
+        end
+        else
+        begin
+            $write("%c",uart_data);
+        end
+    end
+end
+
 
 initial begin
-    unit_test("add",220);
-    unit_test("addi",115);
-    unit_test("addiw",111);
-    unit_test("addw",215);
-    unit_test("and",355);
-    unit_test("andi",113);
-    unit_test("auipc",15);
-    unit_test("beq",73);
-    unit_test("bge",80);
-    unit_test("bgeu",215);
-    unit_test("blt",72);
-    unit_test("bltu",205);
-    unit_test("bne",75);
-    unit_test("jal",9);
-    unit_test("jalr",46);
-    unit_test("lb",126);
-    unit_test("lbu",126);
-    unit_test("ld",266);
-    unit_test("lh",142);
-    unit_test("lhu",151);
-    unit_test("lui",15);
-    unit_test("lw",154);
-    unit_test("lwu",180);
-    unit_test("or",391);
-    unit_test("ori",108);
-    unit_test("sb",205);
-    unit_test("sd",401);
-    unit_test("sh",278);
-    // unit_test("simple",281);
-    unit_test("sll",281);
-    unit_test("slli",134);
-    unit_test("slliw",140);
-    unit_test("sllw",281);
-    unit_test("slt",196);
-    unit_test("slti",98);
-    unit_test("sltiu",98);
-    unit_test("sltu",213);
-    unit_test("sra",261);
-    unit_test("srai",133);
-    unit_test("sraiw",171);
-    unit_test("sraw",297);
-    unit_test("srl",327);
-    unit_test("srli",156);
-    unit_test("srliw",152);
-    unit_test("srlw",287);
-    unit_test("sub",211);
-    unit_test("subw",206);
-    unit_test("sw",289);
-    unit_test("xor",387);
-    unit_test("xori",106);
-
-
+    perf_test("test_microbench",338934);
+    // unit_test("load-store",251);
+    // unit_test("hello-str",626);
+    // unit_test("shift",210);
+    // unit_test("string",811);
+    // unit_test("unalign",104);
     $display("-------ALL TEST FINISH-------- !!!");
     $finish;
 end

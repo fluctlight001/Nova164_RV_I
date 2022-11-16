@@ -66,7 +66,7 @@ THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 `define TIMER_ADDR     16'he000   //32'hbfaf_e000 
 
 `define IO_SIMU_ADDR      16'hffec  //32'hbfaf_ffec
-`define VIRTUAL_UART_ADDR 16'hfff0  //32'hbfaf_fff0
+`define VIRTUAL_UART_ADDR 16'h03f8  //32'hbfaf_fff0
 `define SIMU_FLAG_ADDR    16'hfff4  //32'hbfaf_fff4 
 `define OPEN_TRACE_ADDR   16'hfff8  //32'hbfaf_fff8
 `define NUM_MONITOR_ADDR  16'hfffc  //32'hbfaf_fffc

@@ -116,18 +116,6 @@ begin: pll
 end
 endgenerate
 
-// //cpu inst sram
-// wire        cpu_inst_en;
-// wire [7 :0] cpu_inst_wen;
-// wire [63:0] cpu_inst_addr;
-// wire [63:0] cpu_inst_wdata;
-// wire [63:0] cpu_inst_rdata;
-// //cpu data sram
-// wire        cpu_data_en;
-// wire [7 :0] cpu_data_wen;
-// wire [63:0] cpu_data_addr;
-// wire [63:0] cpu_data_wdata;
-// wire [63:0] cpu_data_rdata;
 
 //*wire
 wire                              master_axi_aw_ready   ;

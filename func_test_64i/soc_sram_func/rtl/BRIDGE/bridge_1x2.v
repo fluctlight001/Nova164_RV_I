@@ -45,8 +45,8 @@ THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //   > Author      : LOONGSON
 //   > Date        : 2017-08-04
 //*************************************************************************
-`define CONF_ADDR_BASE 64'h0000_0000_1faf_0000
-`define CONF_ADDR_MASK 64'h0000_0000_ffff_0000
+`define CONF_ADDR_BASE 64'h0000_0000_a000_03f8
+`define CONF_ADDR_MASK 64'h0000_0000_ffff_ffff
 module bridge_1x2(                                 
     input                           clk,          // clock 
     input                           resetn,       // reset, active low

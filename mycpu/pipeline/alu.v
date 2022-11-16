@@ -1,4 +1,4 @@
-/* alu module: Archmetic login unit, combinational digital circuit
+/* alu module: Archmetci login unit, combinational digital circuit
 ** input: 
 ** alu_op:      the control signal to decide which operations
 ** alu_src1:    the first operand 
