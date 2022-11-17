@@ -6,6 +6,8 @@ module ID
     input wire rst_n,
     input wire [5:0] stall,
     input wire br_e,
+    //when id stallreq
+    //ex is load and data 相关
     output wire stallreq_id,
 
     input wire pc_valid,
@@ -38,14 +40,17 @@ module ID
             pc_valid_r <= 1'b0;
             pc_r <= 64'b0;
         end
+        //nop, if stall and id not stall
         else if (stall[1]&(!stall[2]))begin
             pc_valid_r <= 1'b0;
             pc_r <= 64'b0;
         end
+        //nop, if not stall and br
         else if (!stall[1]&br_e) begin
             pc_valid_r <= 1'b0;
             pc_r <= 64'b0;
         end
+        // if not stall so go on
         else if (!stall[1]) begin
             pc_valid_r <= pc_valid;
             pc_r <= pc;
@@ -60,6 +65,7 @@ module ID
             inst_r <= 64'b0;
             stall_flag <= 1'b0;
         end
+        //if not stall, get inst from inst_sram
         else if (!stall[1]) begin
             inst_r <= inst_sram_rdata;
             stall_flag <= 1'b0;
@@ -67,6 +73,7 @@ module ID
         else if (stall_flag) begin
             
         end
+        //if stall and id stall, get inst from inst_ram ? 
         else if (stall[1]&stall[2]) begin
             inst_r <= inst_sram_rdata;
             stall_flag <= 1'b1;
@@ -113,23 +120,24 @@ module ID
     );
 
     assign id2ex_bus = {
-        sel_src1,
-        sel_src2,
-        rs1,
-        rs2,
-        rdata1,
-        rdata2,
-        imm,
-        alu_op,
-        bru_op & {8{pc_valid_r}},
-        lsu_op & {7{pc_valid_r}},
-        sel_rf_res,
-        rf_we & pc_valid_r,
-        rf_waddr & {5{pc_valid_r}},
-        pc_r,
-        inst & {32{pc_valid_r}}
+        sel_src1,                     //2
+        sel_src2,                     //1
+        rs1,                          //5
+        rs2,                          //5
+        rdata1,                       //64
+        rdata2,                       //64
+        imm,                          //64
+        alu_op,                       //15
+        bru_op & {8{pc_valid_r}},     //8
+        lsu_op & {7{pc_valid_r}},     //7
+        sel_rf_res,                   //2
+        rf_we & pc_valid_r,           //1
+        rf_waddr & {5{pc_valid_r}},   //5
+        pc_r,                         //64
+        inst & {32{pc_valid_r}}       //32
     };
 
+    //通过时钟，在下一个状态获取，但是放在了ID段（好离谱
     reg [6:0] ex_load_buffer;
 
     always @ (posedge clk) begin
@@ -148,6 +156,7 @@ module ID
     wire ex_rf_we;
     wire [4:0] ex_rf_waddr;
     assign {ex_is_load,ex_rf_we,ex_rf_waddr} = ex_load_buffer;
+    //ex段为load指令，且发生数据相关时，id段需要被暂停
     wire stallreq_load;
     assign stallreq_load = ex_is_load & ex_rf_we & ((ex_rf_waddr==rs1 & rs1!=0)|(ex_rf_waddr==rs2 & rs2!=0));
     assign stallreq_id = stallreq_load;

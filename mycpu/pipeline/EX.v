@@ -28,12 +28,15 @@ module EX
         if (!rst_n) begin
             id2ex_bus_r <= 0;
         end
+        //nop, id stall and ex not stall
         else if (stall[2]&(!stall[3])) begin
             id2ex_bus_r <= 0;
         end
+        //nop, id stall and br_bus[64] ? 
         else if (!stall[2]&br_bus[64]) begin
             id2ex_bus_r <= 0;
         end
+        // id not stall so can go on
         else if (!stall[2]) begin
             id2ex_bus_r <= id2ex_bus;
         end
@@ -42,34 +45,34 @@ module EX
     wire [1:0] sel_src1;
     wire sel_src2;
     wire [4:0] rs1, rs2;
+    wire [63:0] rdata1, rdata2;
     wire [63:0] imm;
-    wire [12:0] alu_op;
+    wire [14:0] alu_op;
     wire [7:0] bru_op;
     wire [6:0] lsu_op;
-    wire [9:0] csr_op;
     wire [1:0] sel_rf_res;
     wire rf_we;
     wire [4:0] rf_waddr;
     wire [63:0] pc;
     wire [31:0] inst;
-    wire [63:0] rdata1, rdata2;
+    wire [9:0] csr_op;
 
     assign {
-        sel_src1,
-        sel_src2,
-        rs1,
-        rs2,
-        rdata1,
-        rdata2,
-        imm,
-        alu_op,
-        bru_op,
-        lsu_op,
-        sel_rf_res,
-        rf_we,
-        rf_waddr,
-        pc,
-        inst
+        sel_src1,       //2
+        sel_src2,       //1
+        rs1,            //5
+        rs2,            //5
+        rdata1,         //64
+        rdata2,         //64
+        imm,            //64
+        alu_op,         //15
+        bru_op,         //8
+        lsu_op,         //7
+        sel_rf_res,     //2
+        rf_we,          //1
+        rf_waddr,       //5
+        pc,             //64
+        inst            //32
     } = id2ex_bus_r;
 
     wire [63:0] src1, src2;
