@@ -139,7 +139,6 @@ module mycpu_top #(
         .debug_wb_rf_wnum  (debug_wb_rf_wnum  ),
         .debug_wb_rf_wdata (debug_wb_rf_wdata )
     );
-
     bridge_1x2 u_bridge_1x2(
     .clk             (clk             ),
     .resetn          (resetn          ),
