@@ -6,7 +6,7 @@
 ** alu_result:  the archmetic result
 */
 module alu(
-    input wire [12:0] alu_op,
+    input wire [14:0] alu_op,
     input wire [63:0] alu_src1,
     input wire [63:0] alu_src2,
     output wire [63:0] alu_result
@@ -27,6 +27,8 @@ module alu(
     wire op_sllw;
     wire op_srlw;
     wire op_sraw;
+    assign {op_and, op_or, op_xor, op_add, 
+      op_sub, op_slt, op_sltu, op_sll, op_srl, op_sra, op_addw, op_subw, op_sllw, op_srlw, op_sraw} = alu_op;
 
     wire [63:0] and_result;
     wire [63:0] or_result; 
@@ -74,6 +76,7 @@ module alu(
     assign or_result = alu_src1 | alu_src2;
     assign xor_result = alu_src1 ^ alu_src2;
     assign add_sub_result = adder_result;
+    assign addw_subw_result = adder_result_w;
 
     assign slt_result[63:1] = 63'b0;
     assign slt_result[0] = (alu_src1[63] & ~alu_src2[63]) 
@@ -101,7 +104,7 @@ module alu(
                       | ({64{op_sll         }} & sll_result)
                       | ({64{op_srl         }} & srl_result)
                       | ({64{op_sra         }} & sra_result)
-                      | ({64{op_addw}}         & {{32{addw_subw_result[31]}}, addw_subw_result})
+                      | ({64{op_addw|op_subw}} & {{32{addw_subw_result[31]}}, addw_subw_result})
                       | ({64{op_sllw        }} & {{32{sllw_result[31]}}, sllw_result})
                       | ({64{op_srlw        }} & {{32{srlw_result[31]}}, srlw_result})
                       | ({64{op_sraw        }} & {{32{sraw_result[31]}}, sraw_result});

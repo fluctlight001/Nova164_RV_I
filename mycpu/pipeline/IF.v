@@ -31,10 +31,6 @@ module IF(
             pc <= pc_nxt;
         end
     end
-    /*有个问题，如果这里设置成800f_fffcH，
-    那么复位结束时不是会想存储器访问一次，
-    如果这个位置没数据还好，如果存在数据会不会出事情*/
-     
 
     assign pc_nxt = br_e ? br_addr : pc + 4'h4;
 
