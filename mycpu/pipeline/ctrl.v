@@ -6,12 +6,7 @@ module ctrl(
     input wire stallreq_axi,
     output reg [`StallBus-1:0] stall
 );
-    //stall[0] --?
-    //stall[1] --?
-    //stall[2] --id
-    //stall[3]
-    //stall[4]
-    //stall[5]
+
     always @ (*) begin
         if (!rst_n) begin
             stall = `StallBus'b0;

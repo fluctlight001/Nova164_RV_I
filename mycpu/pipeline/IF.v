@@ -30,6 +30,10 @@ module IF(
             pc_valid <= 1'b1;
             pc <= pc_nxt;
         end
+        /* if (stall[0] & stall[1]) begin  */
+        /*   pc_valid <= 1'b0; */
+        /*   pc <= 0; */
+        /* end */
     end
 
     assign pc_nxt = br_e ? br_addr : pc + 4'h4;
